@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,16 +41,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="CudaEnumerators\CudaKernelException.cs" />
     <Compile Include="CudaEnumerators\MathDomain.cs" />
     <Compile Include="CudaEnumerators\MatrixOperation.cs" />
     <Compile Include="CudaEnumerators\MemorySpace.cs" />
     <Compile Include="CudaStructures\MemoryBuffer.cs" />
     <Compile Include="CudaStructures\MemoryCube.cs" />
     <Compile Include="CudaStructures\MemoryTile.cs" />
+    <Compile Include="CudaStructures\SparseMemoryBuffer.cs" />
     <Compile Include="CudaStructures\SparseMemoryTile.cs" />
     <Compile Include="CudaStructures\Utilities.cs" />
+    <Compile Include="Exceptions\CudaException.cs" />
+    <Compile Include="Exceptions\Exception.cs" />
+    <Compile Include="Manager\CudaAPI\BufferInitializerApi.cs" />
+    <Compile Include="Manager\CudaAPI\CuBlasApi.cs" />
+    <Compile Include="Manager\CudaAPI\CuSparseApi.cs" />
+    <Compile Include="Manager\CudaAPI\DeviceApi.cs" />
+    <Compile Include="Manager\DeviceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
