@@ -10,7 +10,7 @@ namespace CudaLightSharp.Manager.CudaAPI
 {
     internal unsafe static class BufferInitializerApi
     {
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Initialize(MemoryBuffer buffer, double value);
         public static void Initialize(MemoryBuffer buffer, double value)
         {
@@ -19,7 +19,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_Initialize", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _LinSpace(MemoryBuffer buffer, double x0, double x1);
         public static void LinSpace(MemoryBuffer buffer, double x0, double x1)
         {
@@ -28,7 +28,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_LinSpace", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _RandUniform(MemoryBuffer buffer, int seed);
         public static void RandUniform(MemoryBuffer buffer, int seed)
         {
@@ -37,7 +37,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_RandUniform", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _RandNormal(MemoryBuffer buffer, int seed);
         public static void RandNormal(MemoryBuffer buffer, int seed)
         {

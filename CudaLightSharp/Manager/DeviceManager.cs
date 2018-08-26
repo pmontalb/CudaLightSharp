@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CudaLightSharp.Manager
 {
-    internal static class DeviceManager
+    public static class DeviceManager
     {
         public static int GetDeviceCount()
         {

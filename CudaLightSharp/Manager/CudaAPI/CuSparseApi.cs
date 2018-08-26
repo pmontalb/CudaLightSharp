@@ -11,7 +11,7 @@ namespace CudaLightSharp.Manager.CudaAPI
 {
     internal unsafe static class CuSparseApi
     {
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _SparseAdd(MemoryBuffer z, SparseMemoryBuffer x, MemoryBuffer y, double alpha);
         public static void SparseAdd(MemoryBuffer z, SparseMemoryBuffer x, MemoryBuffer y, double alpha)
         {
@@ -20,7 +20,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_SparseAdd", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _SparseSubtract(MemoryBuffer z, SparseMemoryBuffer x, MemoryBuffer y);
         public static void SparseSubtract(MemoryBuffer z, SparseMemoryBuffer x, MemoryBuffer y)
         {
@@ -29,7 +29,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_SparseSubtract", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _SparseDot(MemoryBuffer y, SparseMemoryTile A, MemoryBuffer x, MatrixOperation aOperation, double alpha);
         public static void SparseDot(MemoryBuffer y, SparseMemoryTile A, MemoryBuffer x, MatrixOperation aOperation, double alpha)
         {
@@ -38,7 +38,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_SparseDot", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _SparseMultiply(MemoryTile A, SparseMemoryTile B, MemoryTile C, int leadingDimensionB, int leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha);
         public static void SparseMultiply(MemoryTile A, SparseMemoryTile B, MemoryTile C, int leadingDimensionB, int leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha)
         {

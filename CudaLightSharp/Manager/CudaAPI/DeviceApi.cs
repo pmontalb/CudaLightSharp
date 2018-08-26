@@ -10,7 +10,7 @@ namespace CudaLightSharp.Manager.CudaAPI
 {
     internal unsafe static class DeviceApi
     {
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _GetDevice(ref int device);
         public static int GetDevice()
         {
@@ -22,7 +22,7 @@ namespace CudaLightSharp.Manager.CudaAPI
             return dev;
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _ThreadSynchronize();
         public static void ThreadSynchronize()
         {
@@ -31,7 +31,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_ThreadSynchronize", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _SetDevice(int device);
         public static void SetDevice(int device)
         {
@@ -40,7 +40,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_SetDevice", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _GetDeviceStatus();
         public static int GetDeviceStatus()
         {
@@ -51,7 +51,7 @@ namespace CudaLightSharp.Manager.CudaAPI
             return err;
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _GetBestDevice(ref int dev);
         public static int GetBestDevice()
         {
@@ -63,7 +63,7 @@ namespace CudaLightSharp.Manager.CudaAPI
             return dev;
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _GetDeviceCount(ref int count);
         public static int GetDeviceCount()
         {
@@ -75,7 +75,7 @@ namespace CudaLightSharp.Manager.CudaAPI
             return count;
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _HostToHostCopy(MemoryBuffer dest, MemoryBuffer source);
         public static void HostToHostCopy(MemoryBuffer dest, MemoryBuffer source)
         {
@@ -84,7 +84,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_HostToHostCopy", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _HostToDeviceCopy(MemoryBuffer dest, MemoryBuffer source);
         public static void HostToDeviceCopy(MemoryBuffer dest, MemoryBuffer source)
         {
@@ -93,7 +93,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_HostToDeviceCopy", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _DeviceToDeviceCopy(MemoryBuffer dest, MemoryBuffer source);
         public static void DeviceToDeviceCopy(MemoryBuffer dest, MemoryBuffer source)
         {
@@ -102,7 +102,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_DeviceToDeviceCopy", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _AutoCopy(MemoryBuffer dest, MemoryBuffer source);
         public static void AutoCopy(MemoryBuffer dest, MemoryBuffer source)
         {
@@ -111,7 +111,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_AutoCopy", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Alloc(ref MemoryBuffer buffer);
         public static void Alloc(ref MemoryBuffer buffer)
         {
@@ -120,7 +120,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_Alloc", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _AllocHost(ref MemoryBuffer buffer);
         public static void AllocHost(ref MemoryBuffer buffer)
         {
@@ -129,7 +129,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("_AllocHost", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Free(MemoryBuffer buffer);
         public static void Free(MemoryBuffer buffer)
         {
@@ -138,7 +138,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CudaKernelExceptionFactory.ThrowException("Free", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _FreeHost(MemoryBuffer buffer);
         public static void FreeHost(MemoryBuffer buffer)
         {

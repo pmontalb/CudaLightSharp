@@ -11,7 +11,7 @@ namespace CudaLightSharp.Manager.CudaAPI
 {
     internal unsafe static class CuBlasApi
     {
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Add(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha);
         public static void Add(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha)
         {
@@ -20,7 +20,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Add", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Subtract(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y);
         public static void Subtract(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y)
         {
@@ -29,7 +29,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Subtract", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _AddEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha);
         public static void AddEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha)
         {
@@ -38,7 +38,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AddEqual", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _AddEqualMatrix(MemoryTile A, MemoryTile B, MatrixOperation aOperation, MatrixOperation bOperation, double alpha);
         public static void AddEqualMatrix(MemoryTile A, MemoryTile B, MatrixOperation aOperation, MatrixOperation bOperation, double alpha)
         {
@@ -47,7 +47,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AddEqualMatrix", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _SubtractEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y);
         public static void SubtractEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y)
         {
@@ -56,7 +56,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_SubtractEqual", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Scale(MemoryBuffer z, double alpha);
         public static void Scale(MemoryBuffer z, double alpha)
         {
@@ -65,7 +65,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Scale", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _ElementwiseProduct(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha);
         public static void ElementwiseProduct(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha)
         {
@@ -74,7 +74,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_ElementwiseProduct", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Multiply(MemoryTile A, MemoryTile B, MemoryTile C, int leadingDimensionB, int leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha);
         public static void Multiply(MemoryTile A, MemoryTile B, MemoryTile C, int leadingDimensionB, int leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha)
         {
@@ -83,7 +83,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Multiply", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Dot(MemoryBuffer y, MemoryTile A, MemoryBuffer x, MatrixOperation aOperation, double alpha);
         public static void Dot(MemoryBuffer y, MemoryTile A, MemoryBuffer x, MatrixOperation aOperation, double alpha)
         {
@@ -92,7 +92,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Dot", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _CumulativeRowSum(MemoryTile A);
         public static void CumulativeRowSum(MemoryTile A)
         {
@@ -101,7 +101,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_CumulativeRowSum", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Eye(MemoryTile A);
         public static void Eye(MemoryTile A)
         {
@@ -110,7 +110,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Eye", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Solve(MemoryTile A, MemoryTile B, MatrixOperation aOperation);
         public static void Solve(MemoryTile A, MemoryTile B, MatrixOperation aOperation)
         {
@@ -119,7 +119,7 @@ namespace CudaLightSharp.Manager.CudaAPI
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Solve", err);
         }
 
-        [DllImport("CudaKernels")]
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _Invert(MemoryTile A, MatrixOperation aOperation);
         public static void Invert(MemoryTile A, MatrixOperation aOperation)
         {
