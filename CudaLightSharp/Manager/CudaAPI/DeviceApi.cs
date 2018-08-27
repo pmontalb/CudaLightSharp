@@ -1,4 +1,5 @@
-﻿using CudaLightSharp.CudaStructures;
+﻿using CudaLightSharp.CudaEnumerators;
+using CudaLightSharp.CudaStructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,75 +77,12 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _HostToHostCopy(MemoryBuffer dest, MemoryBuffer source);
-        public static void HostToHostCopy(MemoryBuffer dest, MemoryBuffer source)
+        private static extern unsafe int _GetDeviceProperties(ref CudaDeviceProperties props, int dev);
+        public static void GetDeviceProperties(ref CudaDeviceProperties props, int dev)
         {
-            int err = _HostToHostCopy(dest, source);
+            int err = _GetDeviceProperties(ref props, dev);
             if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("_HostToHostCopy", err);
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _HostToDeviceCopy(MemoryBuffer dest, MemoryBuffer source);
-        public static void HostToDeviceCopy(MemoryBuffer dest, MemoryBuffer source)
-        {
-            int err = _HostToDeviceCopy(dest, source);
-            if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("_HostToDeviceCopy", err);
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _DeviceToDeviceCopy(MemoryBuffer dest, MemoryBuffer source);
-        public static void DeviceToDeviceCopy(MemoryBuffer dest, MemoryBuffer source)
-        {
-            int err = _DeviceToDeviceCopy(dest, source);
-            if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("_DeviceToDeviceCopy", err);
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _AutoCopy(MemoryBuffer dest, MemoryBuffer source);
-        public static void AutoCopy(MemoryBuffer dest, MemoryBuffer source)
-        {
-            int err = _AutoCopy(dest, source);
-            if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("_AutoCopy", err);
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _Alloc(ref MemoryBuffer buffer);
-        public static void Alloc(MemoryBuffer buffer)
-        {
-            int err = _Alloc(ref buffer);
-            if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("_Alloc", err);
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _AllocHost(ref MemoryBuffer buffer);
-        public static void AllocHost(MemoryBuffer buffer)
-        {
-            int err = _AllocHost(ref buffer);
-            if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("_AllocHost", err);
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _Free(MemoryBuffer buffer);
-        public static void Free(MemoryBuffer buffer)
-        {
-            int err = _Free(buffer);
-            if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("Free", err);
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _FreeHost(MemoryBuffer buffer);
-        public static void FreeHost(MemoryBuffer buffer)
-        {
-            int err = _FreeHost(buffer);
-            if (err != 0)
-                Exceptions.CudaKernelExceptionFactory.ThrowException("Free", err);
+                Exceptions.CudaKernelExceptionFactory.ThrowException("_GetDeviceProperties", err);
         }
     }
 }

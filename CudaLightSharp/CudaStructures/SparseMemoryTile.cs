@@ -6,25 +6,32 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+using PtrT = System.UInt64;
+#endif
+
 namespace CudaLightSharp.CudaStructures
 {
     /**
     * CSR Matrix representation
     */
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    internal class SparseMemoryTile : MemoryBuffer
+    internal class SparseMemoryTile: MemoryBuffer
     {
-        public UIntPtr nonZeroColumnIndices;
-        public UIntPtr nNonZeroRows;
-        public int nRows;
-        public int nCols;
+        public PtrT nonZeroColumnIndices;
+        public PtrT nNonZeroRows;
+        public uint nRows;
+        public uint nCols;
 
-        public SparseMemoryTile(UIntPtr pointer = default(UIntPtr),
-                                int nNonZeros = 0,
-                                UIntPtr nonZeroColumnIndices = default(UIntPtr),
-                                UIntPtr nNonZeroRows = default(UIntPtr),
-                                int nRows = 0,
-                                int nCols = 0,
+        public SparseMemoryTile(PtrT pointer = 0,
+                                uint nNonZeros = 0,
+                                PtrT nonZeroColumnIndices = 0,
+                                PtrT nNonZeroRows = 0,
+                                uint nRows = 0,
+                                uint nCols = 0,
                                 MemorySpace memorySpace = MemorySpace.Null,
                                 MathDomain mathDomain = MathDomain.Null)
             : base(pointer, nNonZeros, memorySpace, mathDomain)

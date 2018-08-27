@@ -26,5 +26,20 @@ namespace UnitTests
             DeviceManager.SetBestDevice();
             DeviceManager.CheckDeviceSanity();
         }
+
+        [TestMethod]
+        public void DeviceProperties()
+        {
+            for (int i = 0; i < DeviceManager.GetDeviceCount(); ++i)
+            {
+                var dp = DeviceManager.GetDeviceProperties(i);
+                Assert.IsTrue(dp.major > 0);
+                Assert.IsTrue(dp.clockRate > 0);
+                Assert.IsTrue(dp.warpSize > 0);
+            }
+
+            DeviceManager.SetBestDevice();
+            DeviceManager.CheckDeviceSanity();
+        }
     }
 }

@@ -32,5 +32,13 @@ namespace CudaLightSharp.Manager
             if (err != 0)
                 throw new InvalidProgramException("GPU is in a non-valid state: " + err);
         }
+
+        public static CudaStructures.CudaDeviceProperties GetDeviceProperties(int device)
+        {
+            var ret = new CudaStructures.CudaDeviceProperties();
+            DeviceApi.GetDeviceProperties(ref ret, device);
+
+            return ret;
+        }
     }
 }

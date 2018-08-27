@@ -56,6 +56,7 @@
     <Compile Include="CudaEnumerators\MathDomain.cs" />
     <Compile Include="CudaEnumerators\MatrixOperation.cs" />
     <Compile Include="CudaEnumerators\MemorySpace.cs" />
+    <Compile Include="CudaStructures\DeviceProperties.cs" />
     <Compile Include="CudaStructures\MemoryBuffer.cs" />
     <Compile Include="CudaStructures\MemoryCube.cs" />
     <Compile Include="CudaStructures\MemoryTile.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Manager\CudaAPI\CuBlasApi.cs" />
     <Compile Include="Manager\CudaAPI\CuSparseApi.cs" />
     <Compile Include="Manager\CudaAPI\DeviceApi.cs" />
+    <Compile Include="Manager\CudaAPI\MemoryManagerApi.cs" />
     <Compile Include="Manager\DeviceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -76,8 +78,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo copy $(SolutionDir)x64\$(Configuration)\CudaLightKernels.* $(SolutionDir)\BUILD\$(Configuration)\
-copy $(SolutionDir)x64\$(Configuration)\CudaLightKernels.* $(SolutionDir)\BUILD\$(Configuration)\
+    <PostBuildEvent>echo copy $(SolutionDir)x64\$(Configuration)\CudaLightKernels.dll $(SolutionDir)\BUILD\$(Configuration)\
+copy $(SolutionDir)x64\$(Configuration)\CudaLightKernels.dll $(SolutionDir)\BUILD\$(Configuration)\
+
+echo copy $(SolutionDir)x64\$(Configuration)\CudaLightKernels.pdb $(SolutionDir)\BUILD\$(Configuration)\
+copy $(SolutionDir)x64\$(Configuration)\CudaLightKernels.pdb $(SolutionDir)\BUILD\$(Configuration)\
 
 echo copy $(SolutionDir)x64\$(Configuration)\cudart* $(SolutionDir)\BUILD\$(Configuration)\
 copy $(SolutionDir)x64\$(Configuration)\cudart* $(SolutionDir)\BUILD\$(Configuration)\</PostBuildEvent>

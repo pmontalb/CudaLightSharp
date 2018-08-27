@@ -6,20 +6,26 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+using PtrT = System.UInt64;
+#endif
+
 namespace CudaLightSharp.CudaStructures
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    internal class MemoryTile : MemoryBuffer
+    internal class MemoryTile: MemoryBuffer
     {
-        public int nRows;
-        public int nCols;
+        public uint nRows;
+        public uint nCols;
 
-        public MemoryTile(UIntPtr pointer = default(UIntPtr),
-                          int nRows = 0,
-                          int nCols = 0,
+        public MemoryTile(PtrT pointer = 0,
+                          uint nRows = 0,
+                          uint nCols = 0,
                           MemorySpace memorySpace = MemorySpace.Null,
                           MathDomain mathDomain = MathDomain.Null)
-            : base(pointer, nRows * nCols, memorySpace, mathDomain)
+               : base(pointer, nRows * nCols, memorySpace, mathDomain)
         {
             this.nRows = nRows;
             this.nCols = nCols;
@@ -31,19 +37,8 @@ namespace CudaLightSharp.CudaStructures
         }
 
         public MemoryTile(MemoryBuffer buffer)
-            : base(buffer)
+            : this(buffer.pointer, buffer.size, 1, buffer.memorySpace, buffer.mathDomain)
         {
-            this.nRows = buffer.size;
-            this.nCols = 1;
-        }
-
-        protected MemoryTile(UIntPtr pointer,
-            int nRows, int nCols, int size,
-            MemorySpace memorySpace, MathDomain mathDomain)
-            : base(pointer, size, memorySpace, mathDomain)
-        {
-            this.nRows = nRows;
-            this.nCols = nCols;
         }
     }
 }

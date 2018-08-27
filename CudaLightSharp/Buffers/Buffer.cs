@@ -6,6 +6,12 @@ using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using System.Runtime.InteropServices;
 
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+using PtrT = System.UInt64;
+#endif
+
 namespace CudaLightSharp.Buffers
 {
     public unsafe class Buffer : IDisposable
@@ -22,7 +28,7 @@ namespace CudaLightSharp.Buffers
             // if is not the owner it has already been allocated!
             if (!isOwner)
             {
-                Debug.Assert(buffer.pointer != default(UIntPtr));
+                Debug.Assert(buffer.pointer != 0);
                 return;
             }
             Debug.Assert(buffer.size > 0);
@@ -32,17 +38,17 @@ namespace CudaLightSharp.Buffers
 
         internal void Alloc(MemoryBuffer buffer)
         {
-            Debug.Assert(buffer.pointer == default(UIntPtr));
+            Debug.Assert(buffer.pointer == 0);
 
             switch (memorySpace)
             {
                 case MemorySpace.Null:
                     throw new ArgumentNullException();
                 case MemorySpace.Host:
-                    DeviceApi.AllocHost(buffer);
+                    MemoryManagerApi.AllocHost(buffer);
                     break;
                 case MemorySpace.Device:
-                    DeviceApi.Alloc(buffer);
+                    MemoryManagerApi.Alloc(buffer);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -51,7 +57,7 @@ namespace CudaLightSharp.Buffers
 
         internal void Alloc<T>(int bufferSize, T value) where T : struct, IEquatable<T>, IFormattable
         {
-            buffer = new MemoryBuffer(default(UIntPtr), bufferSize, memorySpace, mathDomain);
+            buffer = new MemoryBuffer(0, (uint)bufferSize, memorySpace, mathDomain);
             Alloc(buffer);
 
             Set(value);
@@ -61,9 +67,9 @@ namespace CudaLightSharp.Buffers
 
         internal void ReadFrom(Buffer rhs)
         {
-            Debug.Assert(buffer.pointer != default(UIntPtr));
-            Debug.Assert(rhs.buffer.pointer != default(UIntPtr));
-            DeviceApi.AutoCopy(buffer, rhs.buffer);
+            Debug.Assert(buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+            MemoryManagerApi.AutoCopy(buffer, rhs.buffer);
         }
 
         public void ReadFrom<T>(T[] rhs) where T : struct, IEquatable<T>, IFormattable
@@ -84,7 +90,7 @@ namespace CudaLightSharp.Buffers
 
         private void ReadFrom(object rhs, int nElements)
         {
-            MemoryBuffer rhsBuf = null;
+            MemoryBuffer rhsBuf;
             switch (mathDomain)
             {
                 case MathDomain.Null:
@@ -93,28 +99,28 @@ namespace CudaLightSharp.Buffers
                     fixed (int* rhsPtr = (int[])rhs)
                     {
                         Debug.Assert(rhsPtr != null);
-                        rhsBuf = new MemoryBuffer((UIntPtr)rhsPtr, nElements, memorySpace, mathDomain);
+                        rhsBuf = new MemoryBuffer((PtrT)rhsPtr, (uint)nElements, memorySpace, mathDomain);
                     }
                     break;
                 case MathDomain.Float:
                     fixed (float* rhsPtr = (float[])rhs)
                     {
                         Debug.Assert(rhsPtr != null);
-                        rhsBuf = new MemoryBuffer((UIntPtr)rhsPtr, nElements, memorySpace, mathDomain);
+                        rhsBuf = new MemoryBuffer((PtrT)rhsPtr, (uint)nElements, memorySpace, mathDomain);
                     }
                     break;
                 case MathDomain.Double:
                     fixed (double* rhsPtr = (double[])rhs)
                     {
                         Debug.Assert(rhsPtr != null);
-                        rhsBuf = new MemoryBuffer((UIntPtr)rhsPtr, nElements, memorySpace, mathDomain);
+                        rhsBuf = new MemoryBuffer((PtrT)rhsPtr, (uint)nElements, memorySpace, mathDomain);
                     }
                     break;
                 default:
                     throw new NotImplementedException();
             }
 
-            DeviceApi.AutoCopy(buffer, rhsBuf);
+            MemoryManagerApi.AutoCopy(buffer, rhsBuf);
         }
 
         #endregion
@@ -123,25 +129,25 @@ namespace CudaLightSharp.Buffers
 
         public void Set<T>(T value) where T : struct, IEquatable<T>, IFormattable
         {
-            Debug.Assert(buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
             BufferInitializerApi.Initialize(buffer, Convert.ToDouble(value));
         }
 
         public void LinSpace<T>(T x0, T x1) where T : struct, IEquatable<T>, IFormattable
         {
-            Debug.Assert(buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
             BufferInitializerApi.LinSpace(buffer, Convert.ToDouble(x0), Convert.ToDouble(x1));
         }
 
         public void RandomUniform(int seed = 1234)
         {
-            Debug.Assert(buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
             BufferInitializerApi.RandUniform(buffer, seed);
         }
 
         public void RandomGaussian(int seed = 1234)
         {
-            Debug.Assert(buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
             BufferInitializerApi.RandNormal(buffer, seed);
         }
 
@@ -164,16 +170,16 @@ namespace CudaLightSharp.Buffers
 
             Debug.WriteLine(String.Format("{0:G}, {1}: {2}[{3}]", DateTime.Now, "Disposing", GetType(), buffer.pointer));
 
-            Debug.Assert(buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
             switch (memorySpace)
             {
                 case MemorySpace.Null:
                     throw new ArgumentNullException();
                 case MemorySpace.Host:
-                    DeviceApi.FreeHost(buffer);
+                    MemoryManagerApi.FreeHost(buffer);
                     break;
                 case MemorySpace.Device:
-                    DeviceApi.Free(buffer);
+                    MemoryManagerApi.Free(buffer);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -188,12 +194,12 @@ namespace CudaLightSharp.Buffers
 
         public T[] GetRaw<T>() where T : struct, IEquatable<T>, IFormattable
         {
-            Debug.Assert(buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
 
             // prepare a buffer host-side
-            MemoryBuffer hostBuffer = new MemoryBuffer(default(UIntPtr), (int)buffer.size, MemorySpace.Host, mathDomain);
-            DeviceApi.AllocHost(hostBuffer);
-            DeviceApi.AutoCopy(hostBuffer, buffer);
+            MemoryBuffer hostBuffer = new MemoryBuffer(0, (uint)buffer.size, MemorySpace.Host, mathDomain);
+            MemoryManagerApi.AllocHost(hostBuffer);
+            MemoryManagerApi.AutoCopy(hostBuffer, buffer);
 
             object ret = null;
 
@@ -203,22 +209,22 @@ namespace CudaLightSharp.Buffers
                     throw new ArgumentNullException();
                 case MathDomain.Int:
                     ret = new int[hostBuffer.size];
-                    Marshal.Copy((IntPtr)hostBuffer.pointer.ToPointer(), (int[])ret, 0, (int)hostBuffer.size);
+                    Marshal.Copy((IntPtr)hostBuffer.pointer, (int[])ret, 0, (int)hostBuffer.size);
                     break;
                 case MathDomain.Float:
                     ret = new float[hostBuffer.size];
-                    Marshal.Copy((IntPtr)hostBuffer.pointer.ToPointer(), (float[])ret, 0, (int)hostBuffer.size);
+                    Marshal.Copy((IntPtr)hostBuffer.pointer, (float[])ret, 0, (int)hostBuffer.size);
                     break;
                 case MathDomain.Double:
                     ret = new double[hostBuffer.size];
-                    Marshal.Copy((IntPtr)hostBuffer.pointer.ToPointer(), (double[])ret, 0, (int)hostBuffer.size);
+                    Marshal.Copy((IntPtr)hostBuffer.pointer, (double[])ret, 0, (int)hostBuffer.size);
                     break;
                 default:
                     throw new NotImplementedException();
             }
 
 
-            return (T[])Convert.ChangeType(ret, typeof(T));
+            return (T[])Convert.ChangeType(ret, typeof(T[]));
         }
 
         public Vector<T> Get<T>() where T : struct, IEquatable<T>, IFormattable
@@ -255,21 +261,30 @@ namespace CudaLightSharp.Buffers
                     throw new ArgumentNullException();
                 case MathDomain.Int:
                     {
-                        var thisVec = Get<int>();
-                        var thatVec = rhs.Get<int>();
-                        return thisVec == thatVec;
+                        var thisVec = GetRaw<int>();
+                        var thatVec = rhs.GetRaw<int>();
+                        if (thisVec.Length != thatVec.Length)
+                            return false;
+
+                        for (int i =0; i < thisVec.Length; ++i)
+                        {
+                            if (thisVec[i] != thatVec[i])
+                                return false;
+                        }
+
+                        return true;
                     }
                 case MathDomain.Float:
                     {
                         var thisVec = Get<float>();
                         var thatVec = rhs.Get<float>();
-                        return thisVec == thatVec;
+                        return (thisVec - thatVec).AbsoluteMaximum() <= 1e-7;
                     }
                 case MathDomain.Double:
                     {
                         var thisVec = Get<double>();
                         var thatVec = rhs.Get<double>();
-                        return thisVec == thatVec;
+                        return (thisVec - thatVec).AbsoluteMaximum() <= 1e-15;
                     }
                 default:
                     throw new NotImplementedException();
@@ -308,14 +323,14 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != default(UIntPtr));
-            Debug.Assert(rhs.buffer.pointer != default(UIntPtr));
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
 
             Buffer tmp = new Buffer(true, lhs.memorySpace, lhs.mathDomain);
-            tmp.buffer = new MemoryBuffer(default(UIntPtr), lhs.Size, lhs.memorySpace, lhs.mathDomain);
+            tmp.buffer = new MemoryBuffer(0, (uint)lhs.Size, lhs.memorySpace, lhs.mathDomain);
             tmp.Alloc(tmp.buffer);
 
-            DeviceApi.AutoCopy(tmp.buffer, lhs.buffer);
+            MemoryManagerApi.AutoCopy(tmp.buffer, lhs.buffer);
             CuBlasApi.AddEqual(tmp.buffer, rhs.buffer, 1.0);
             return tmp;
         }
@@ -325,8 +340,8 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(Size == rhs.Size);
             Debug.Assert(memorySpace == rhs.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
-            Debug.Assert(buffer.pointer != default(UIntPtr));
-            Debug.Assert(rhs.buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
 
             CuBlasApi.AddEqual(buffer, rhs.buffer, alpha);
         }
@@ -336,14 +351,14 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != default(UIntPtr));
-            Debug.Assert(rhs.buffer.pointer != default(UIntPtr));
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
 
             Buffer tmp = new Buffer(true, lhs.memorySpace, lhs.mathDomain);
-            tmp.buffer = new MemoryBuffer(default(UIntPtr), lhs.Size, lhs.memorySpace, lhs.mathDomain);
+            tmp.buffer = new MemoryBuffer(0, (uint)lhs.Size, lhs.memorySpace, lhs.mathDomain);
             tmp.Alloc(tmp.buffer);
 
-            DeviceApi.AutoCopy(tmp.buffer, lhs.buffer);
+            MemoryManagerApi.AutoCopy(tmp.buffer, lhs.buffer);
             CuBlasApi.SubtractEqual(tmp.buffer, rhs.buffer);
             return tmp;
         }
@@ -353,21 +368,21 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != default(UIntPtr));
-            Debug.Assert(rhs.buffer.pointer != default(UIntPtr));
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
 
             Buffer tmp = new Buffer(true, lhs.memorySpace, lhs.mathDomain);
-            tmp.buffer = new MemoryBuffer(default(UIntPtr), lhs.Size, lhs.memorySpace, lhs.mathDomain);
+            tmp.buffer = new MemoryBuffer(0, (uint)lhs.Size, lhs.memorySpace, lhs.mathDomain);
             tmp.Alloc(tmp.buffer);
 
-            DeviceApi.AutoCopy(tmp.buffer, lhs.buffer);
+            MemoryManagerApi.AutoCopy(tmp.buffer, lhs.buffer);
             CuBlasApi.ElementwiseProduct(tmp.buffer, lhs.buffer, rhs.buffer, 1.0);
             return tmp;
         }
 
         public void Scale(double alpha)
         {
-            Debug.Assert(buffer.pointer != default(UIntPtr));
+            Debug.Assert(buffer.pointer != 0);
             CuBlasApi.Scale(buffer, alpha);
         }
 
@@ -378,7 +393,7 @@ namespace CudaLightSharp.Buffers
         public readonly MemorySpace memorySpace;
         public readonly MathDomain mathDomain;
 
-        internal MemoryBuffer buffer = null;
+        internal MemoryBuffer buffer;
         protected readonly bool isOwner;
 
         private bool disposed = false;

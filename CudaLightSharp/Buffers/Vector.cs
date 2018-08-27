@@ -28,7 +28,7 @@ namespace CudaLightSharp.Buffers
         public Vector(int size, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : base(true, memorySpace, mathDomain)
         {
-            buffer = new MemoryBuffer(default(UIntPtr), size, memorySpace, mathDomain);
+            buffer = new MemoryBuffer(0, (uint)size, memorySpace, mathDomain);
             ctor(buffer);
         }
 
@@ -72,6 +72,30 @@ namespace CudaLightSharp.Buffers
         public Vector(Vector<int> rhs)
             : this(rhs.AsArray())
         {
+        }
+
+        public static Vector LinSpace(int size, double x0, double x1, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
+        {
+            var vec = new Vector(size, memorySpace, mathDomain);
+            vec.LinSpace(x0, x1);
+
+            return vec;
+        }
+
+        public static Vector RandomUniform(int size, int seed, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
+        {
+            var vec = new Vector(size, memorySpace, mathDomain);
+            vec.RandomUniform(seed);
+
+            return vec;
+        }
+
+        public static Vector RandomGaussian(int size, int seed, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
+        {
+            var vec = new Vector(size, memorySpace, mathDomain);
+            vec.RandomGaussian(seed);
+
+            return vec;
         }
 
         public void Print(string label = "") 

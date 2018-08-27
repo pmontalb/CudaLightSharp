@@ -6,18 +6,24 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+    using PtrT = System.UInt64;
+#endif
+
 namespace CudaLightSharp.CudaStructures
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    internal class MemoryBuffer
+    public class MemoryBuffer
     {
-        public UIntPtr pointer;
+        public PtrT pointer;
         public MemorySpace memorySpace;
         public MathDomain mathDomain;
-        public int size;
+        public uint size;
 
-        public MemoryBuffer(UIntPtr pointer = default(UIntPtr),
-                            int size = 0,
+        public MemoryBuffer(PtrT pointer = 0,
+                            uint size = 0,
                             MemorySpace memorySpace = MemorySpace.Null,
                             MathDomain mathDomain = MathDomain.Null)
         {
@@ -32,7 +38,7 @@ namespace CudaLightSharp.CudaStructures
         {
         }
 
-        public int ElementarySize()
+        public uint ElementarySize()
         {
             switch (mathDomain)
             {
@@ -47,6 +53,6 @@ namespace CudaLightSharp.CudaStructures
             }
         }
 
-        public int TotalSize => size * ElementarySize();
+        public uint TotalSize => size * (uint)ElementarySize();
     }
 }

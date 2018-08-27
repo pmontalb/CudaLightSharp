@@ -6,21 +6,30 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+using PtrT = System.UInt64;
+#endif
+
 namespace CudaLightSharp.CudaStructures
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    internal class MemoryCube : MemoryTile
+    internal class MemoryCube: MemoryTile
     {
-        public int nCubes;
+        public uint nCubes;
 
-        public MemoryCube(UIntPtr pointer = default(UIntPtr),
-                          int nRows = 0,
-                          int nCols = 0,
-                          int nCubes = 0,
+        public MemoryCube(PtrT pointer = 0,
+                          uint nRows = 0,
+                          uint nCols = 0,
+                          uint nCubes = 0,
                           MemorySpace memorySpace = MemorySpace.Null,
                           MathDomain mathDomain = MathDomain.Null)
-            : base(pointer, nRows, nCols, nRows * nCols * nCubes, memorySpace, mathDomain)
+            : base(pointer, nRows, nCols, memorySpace, mathDomain)
         {
+            this.size = nRows * nCols * nCubes;
+            this.nRows = nRows;
+            this.nCols = nCols;
             this.nCubes = nCubes;
         }
 
