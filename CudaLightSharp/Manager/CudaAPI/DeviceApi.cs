@@ -113,7 +113,7 @@ namespace CudaLightSharp.Manager.CudaAPI
 
         [DllImport("CudaLightKernels")]
         private static extern unsafe int _Alloc(ref MemoryBuffer buffer);
-        public static void Alloc(ref MemoryBuffer buffer)
+        public static void Alloc(MemoryBuffer buffer)
         {
             int err = _Alloc(ref buffer);
             if (err != 0)
@@ -122,7 +122,7 @@ namespace CudaLightSharp.Manager.CudaAPI
 
         [DllImport("CudaLightKernels")]
         private static extern unsafe int _AllocHost(ref MemoryBuffer buffer);
-        public static void AllocHost(ref MemoryBuffer buffer)
+        public static void AllocHost(MemoryBuffer buffer)
         {
             int err = _AllocHost(ref buffer);
             if (err != 0)

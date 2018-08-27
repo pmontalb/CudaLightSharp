@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CudaLightSharp.CudaEnumerators
 {
-    internal enum MatrixOperation
+    public enum MatrixOperation
     {
         None = 0,
         Transpose = 1

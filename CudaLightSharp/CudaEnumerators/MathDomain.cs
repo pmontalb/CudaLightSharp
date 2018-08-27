@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CudaLightSharp.CudaEnumerators
 {
-    internal enum MathDomain
+    public enum MathDomain
     {
         Null,
         Int,

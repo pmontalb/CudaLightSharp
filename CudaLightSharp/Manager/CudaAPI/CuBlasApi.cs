@@ -30,10 +30,10 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _AddEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha);
-        public static void AddEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y, double alpha)
+        private static extern unsafe int _AddEqual(MemoryBuffer z, MemoryBuffer x, double alpha);
+        public static void AddEqual(MemoryBuffer z, MemoryBuffer x, double alpha)
         {
-            int err = _AddEqual(z, x, y, alpha);
+            int err = _AddEqual(z, x, alpha);
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AddEqual", err);
         }
@@ -48,10 +48,10 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _SubtractEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y);
-        public static void SubtractEqual(MemoryBuffer z, MemoryBuffer x, MemoryBuffer y)
+        private static extern unsafe int _SubtractEqual(MemoryBuffer z, MemoryBuffer x);
+        public static void SubtractEqual(MemoryBuffer z, MemoryBuffer x)
         {
-            int err = _SubtractEqual(z, x, y);
+            int err = _SubtractEqual(z, x);
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_SubtractEqual", err);
         }

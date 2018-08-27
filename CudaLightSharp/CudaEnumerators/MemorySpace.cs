@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CudaLightSharp.CudaEnumerators
 {
-    internal enum MemorySpace
+    public enum MemorySpace
     {
         Null,
         Host,
