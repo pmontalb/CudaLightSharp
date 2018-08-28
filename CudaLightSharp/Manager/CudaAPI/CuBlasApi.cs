@@ -7,6 +7,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+    using PtrT = System.UInt64;
+#endif
+
 namespace CudaLightSharp.Manager.CudaAPI
 {
     internal unsafe static class CuBlasApi
@@ -102,12 +108,12 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _Eye(MemoryTile A);
+        private static extern unsafe int _EyeRaw(PtrT pointer, uint nRows, MemorySpace memorySpace, MathDomain mathDomain);
         public static void Eye(MemoryTile A)
         {
-            int err = _Eye(A);
+            int err = _EyeRaw(A.pointer, A.nRows, A.memorySpace, A.mathDomain);
             if (err != 0)
-                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_Eye", err);
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_EyeRaw", err);
         }
 
         [DllImport("CudaLightKernels")]

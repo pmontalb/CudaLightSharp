@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffers\Buffer.cs" />
+    <Compile Include="Buffers\ColumnWiseMatrix.cs" />
     <Compile Include="Buffers\Vector.cs" />
     <Compile Include="CudaEnumerators\MathDomain.cs" />
     <Compile Include="CudaEnumerators\MatrixOperation.cs" />

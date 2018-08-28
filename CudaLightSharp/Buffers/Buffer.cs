@@ -88,6 +88,22 @@ namespace CudaLightSharp.Buffers
             ReadFrom(rhs.AsArray(), rhs.Count);
         }
 
+        public void ReadFrom<T>(T[,] rhs) where T : struct, IEquatable<T>, IFormattable
+        {
+            Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
+                         (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
+                         (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
+            ReadFrom(rhs, rhs.Length);
+        }
+
+        public void ReadFrom<T>(Matrix<T> rhs) where T : struct, IEquatable<T>, IFormattable
+        {
+            Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
+                         (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
+                         (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
+            ReadFrom(rhs.AsArray(), rhs.RowCount * rhs.ColumnCount);
+        }
+
         private void ReadFrom(object rhs, int nElements)
         {
             MemoryBuffer rhsBuf;
