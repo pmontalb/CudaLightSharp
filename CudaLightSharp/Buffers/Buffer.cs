@@ -14,7 +14,7 @@ using PtrT = System.UInt64;
 
 namespace CudaLightSharp.Buffers
 {
-    public unsafe class Buffer : IDisposable
+    public unsafe abstract class Buffer : IDisposable
     {
         internal Buffer(bool isOwner = true, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
         {
@@ -36,11 +36,11 @@ namespace CudaLightSharp.Buffers
             Alloc(buffer);
         }
 
-        internal void Alloc(MemoryBuffer buffer)
+        internal static void Alloc(MemoryBuffer buffer)
         {
             Debug.Assert(buffer.pointer == 0);
 
-            switch (memorySpace)
+            switch (buffer.memorySpace)
             {
                 case MemorySpace.Null:
                     throw new ArgumentNullException();
@@ -57,7 +57,6 @@ namespace CudaLightSharp.Buffers
 
         internal void Alloc<T>(int bufferSize, T value) where T : struct, IEquatable<T>, IFormattable
         {
-            buffer = new MemoryBuffer(0, (uint)bufferSize, memorySpace, mathDomain);
             Alloc(buffer);
 
             Set(value);
@@ -334,21 +333,10 @@ namespace CudaLightSharp.Buffers
 
         #region Linear Algebra
 
-        public static Buffer operator +(Buffer lhs, Buffer rhs)
+        internal static MemoryBuffer Add(MemoryBuffer lhs, MemoryBuffer rhs)
         {
-            Debug.Assert(lhs.Size == rhs.Size);
-            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
-            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-
-            Buffer tmp = new Buffer(true, lhs.memorySpace, lhs.mathDomain);
-            tmp.buffer = new MemoryBuffer(0, (uint)lhs.Size, lhs.memorySpace, lhs.mathDomain);
-            tmp.Alloc(tmp.buffer);
-
-            MemoryManagerApi.AutoCopy(tmp.buffer, lhs.buffer);
-            CuBlasApi.AddEqual(tmp.buffer, rhs.buffer, 1.0);
-            return tmp;
+            CuBlasApi.AddEqual(lhs, rhs, 1.0);
+            return lhs;
         }
 
         public void AddEqual(Buffer rhs, double alpha = 1.0)
@@ -362,38 +350,32 @@ namespace CudaLightSharp.Buffers
             CuBlasApi.AddEqual(buffer, rhs.buffer, alpha);
         }
 
-        public static Buffer operator -(Buffer lhs, Buffer rhs)
+        internal static MemoryBuffer Subtract(MemoryBuffer lhs, MemoryBuffer rhs)
         {
-            Debug.Assert(lhs.Size == rhs.Size);
-            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
-            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-
-            Buffer tmp = new Buffer(true, lhs.memorySpace, lhs.mathDomain);
-            tmp.buffer = new MemoryBuffer(0, (uint)lhs.Size, lhs.memorySpace, lhs.mathDomain);
-            tmp.Alloc(tmp.buffer);
-
-            MemoryManagerApi.AutoCopy(tmp.buffer, lhs.buffer);
-            CuBlasApi.SubtractEqual(tmp.buffer, rhs.buffer);
-            return tmp;
+            CuBlasApi.SubtractEqual(lhs, rhs);
+            return lhs;
         }
 
-        public static Buffer operator %(Buffer lhs, Buffer rhs)
+        public void SubtractEqual(Buffer rhs)
         {
-            Debug.Assert(lhs.Size == rhs.Size);
-            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
-            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(Size == rhs.Size);
+            Debug.Assert(memorySpace == rhs.memorySpace);
+            Debug.Assert(mathDomain == rhs.mathDomain);
+            Debug.Assert(buffer.pointer != 0);
             Debug.Assert(rhs.buffer.pointer != 0);
 
-            Buffer tmp = new Buffer(true, lhs.memorySpace, lhs.mathDomain);
-            tmp.buffer = new MemoryBuffer(0, (uint)lhs.Size, lhs.memorySpace, lhs.mathDomain);
-            tmp.Alloc(tmp.buffer);
+            CuBlasApi.SubtractEqual(buffer, rhs.buffer);
+        }
 
-            MemoryManagerApi.AutoCopy(tmp.buffer, lhs.buffer);
-            CuBlasApi.ElementwiseProduct(tmp.buffer, lhs.buffer, rhs.buffer, 1.0);
-            return tmp;
+        internal static MemoryBuffer ElementWiseProduct(MemoryBuffer lhs, MemoryBuffer rhs)
+        {
+            MemoryBuffer buffer = new MemoryBuffer(0, (uint)lhs.size, lhs.memorySpace, lhs.mathDomain);
+            Alloc(buffer);
+
+            MemoryManagerApi.AutoCopy(buffer, lhs);
+            CuBlasApi.ElementwiseProduct(lhs, buffer, rhs, 1.0);
+
+            return lhs;
         }
 
         public void Scale(double alpha)
@@ -409,7 +391,7 @@ namespace CudaLightSharp.Buffers
         public readonly MemorySpace memorySpace;
         public readonly MathDomain mathDomain;
 
-        internal MemoryBuffer buffer;
+        abstract internal MemoryBuffer buffer { get; }
         protected readonly bool isOwner;
 
         private bool disposed = false;

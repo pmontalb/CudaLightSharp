@@ -1,11 +1,19 @@
 ﻿using CudaLightSharp.CudaEnumerators;
 using CudaLightSharp.CudaStructures;
+using CudaLightSharp.Manager.CudaAPI;
 using MathNet.Numerics.LinearAlgebra;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+    using PtrT = System.UInt64;
+#endif
 
 namespace CudaLightSharp.Buffers
 {
@@ -28,14 +36,14 @@ namespace CudaLightSharp.Buffers
         public Vector(int size, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : base(true, memorySpace, mathDomain)
         {
-            buffer = new MemoryBuffer(0, (uint)size, memorySpace, mathDomain);
+            _buffer = new MemoryBuffer(0, (uint)size, memorySpace, mathDomain);
             ctor(buffer);
         }
 
         public Vector(int size, double value, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : this(size, memorySpace, mathDomain)
         {
-            Alloc(size, value);
+            Set(value);
         }
 
         public Vector(Vector rhs)
@@ -73,6 +81,58 @@ namespace CudaLightSharp.Buffers
             : this(rhs.AsArray())
         {
         }
+
+        internal Vector(MemoryBuffer buffer)
+            : base(false, buffer.memorySpace, buffer.mathDomain)
+        {
+            _buffer = buffer;
+        }
+
+        #region Linear Algebra
+
+        public static Vector operator +(Vector lhs, Vector rhs)
+        {
+            Debug.Assert(lhs.Size == rhs.Size);
+            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
+            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+
+            Vector tmp = new Vector(lhs);
+            Add(tmp.buffer, rhs.buffer);
+
+            return tmp;
+        }
+
+        public static Vector operator -(Vector lhs, Vector rhs)
+        {
+            Debug.Assert(lhs.Size == rhs.Size);
+            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
+            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+
+            Vector tmp = new Vector(lhs);
+            Subtract(tmp.buffer, rhs.buffer);
+
+            return tmp;
+        }
+
+        public static Vector operator %(Vector lhs, Vector rhs)
+        {
+            Debug.Assert(lhs.Size == rhs.Size);
+            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
+            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+
+            Vector tmp = new Vector(lhs);
+            ElementWiseProduct(tmp.buffer, rhs.buffer);
+
+            return tmp;
+        }
+
+        #endregion
 
         public static Vector LinSpace(int size, double x0, double x1, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
         {
@@ -126,5 +186,8 @@ namespace CudaLightSharp.Buffers
                     throw new NotImplementedException();
             }
         }
+
+        private MemoryBuffer _buffer;
+        internal override MemoryBuffer buffer => _buffer;
     }
 }

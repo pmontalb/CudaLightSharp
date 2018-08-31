@@ -3,6 +3,7 @@ using CudaLightSharp.Buffers;
 using CudaLightSharp.Manager;
 using CudaLightSharp.CudaEnumerators;
 using MathNet.Numerics.LinearAlgebra;
+using System;
 
 namespace UnitTests
 {
@@ -129,6 +130,58 @@ namespace UnitTests
             var _m = m.Get<float>();
             for (int i = 0; i < _m.Count / 2; ++i)
                 Assert.IsTrue(System.Math.Abs(_m[2 * i] + _m[2 * i + 1]) <= 1e-7);
+        }
+
+        [TestMethod]
+        public void GetColumn()
+        {
+            var m1 = new ColumnWiseMatrix(10, 5, 1.2345f);
+            m1.Print();
+            DeviceManager.CheckDeviceSanity();
+
+            for (int j = 0; j < m1.nCols; ++j)
+            {
+                var col = m1.Get<float>(j);
+                DeviceManager.CheckDeviceSanity();
+
+                Assert.AreEqual(col.Count, m1.nRows);
+                for (int i = 0; i < m1.nRows; ++i)
+                    Assert.IsTrue(Math.Abs(col[i] - 1.2345f) <= 1e-7);
+            }
+        }
+
+        [TestMethod]
+        public void SetColumn()
+        {
+            var m1 = new ColumnWiseMatrix(10, 5, 1.2345f);
+            m1.Print();
+            DeviceManager.CheckDeviceSanity();
+            var _m1 = m1.Get<float>();
+
+            var v1 = new Vector(10, 2.3456f);
+            v1.Print();
+            DeviceManager.CheckDeviceSanity();
+            var _v1 = v1.Get<float>();
+
+            m1.Set(v1, 3);
+
+            for (int j = 0; j < m1.nCols; ++j)
+            {
+                var col = m1.Get<float>(j);
+                DeviceManager.CheckDeviceSanity();
+
+                Assert.AreEqual(col.Count, m1.nRows);
+                if (j != 3)
+                {
+                    for (int i = 0; i < m1.nRows; ++i)
+                        Assert.IsTrue(Math.Abs(col[i] - _m1[i + m1.nRows * j]) <= 1e-7);
+                }
+                else
+                {
+                    for (int i = 0; i < m1.nRows; ++i)
+                        Assert.IsTrue(Math.Abs(col[i] - _v1[i]) <= 1e-7);
+                }
+            }
         }
     }
 }

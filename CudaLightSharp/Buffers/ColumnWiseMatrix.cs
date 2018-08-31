@@ -9,6 +9,12 @@ using CudaLightSharp.CudaEnumerators;
 using CudaLightSharp.CudaStructures;
 using CudaLightSharp.Manager.CudaAPI;
 
+#if FORCE_32_BIT
+    using PtrT = System.UInt32;
+#else
+    using PtrT = System.UInt64;
+#endif
+
 namespace CudaLightSharp.Buffers
 {
     public static class MatrixExtension
@@ -49,14 +55,23 @@ namespace CudaLightSharp.Buffers
             this.nRows = nRows;
             this.nCols = nCols;
 
-            buffer = new MemoryTile(0, (uint)nRows, (uint)nCols, memorySpace, mathDomain);
+            _buffer = new MemoryTile(0, (uint)nRows, (uint)nCols, memorySpace, mathDomain);
             ctor(buffer);
+
+            columns = new Vector[nCols];
+            uint shift = _buffer.ElementarySize();
+
+            for (int i = 0; i < nCols; i++)
+            {
+                MemoryBuffer columnBuffer = new MemoryBuffer(_buffer.pointer + (PtrT)(i * nRows * shift), (uint)nRows, memorySpace, mathDomain);
+                columns[i] = new Vector(columnBuffer);
+            }
         }
 
         public ColumnWiseMatrix(int nRows, int nCols, double value, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : this(nRows, nCols, memorySpace, mathDomain)
         {
-            Alloc(Size, value);
+            Set(value);
         }
 
         public ColumnWiseMatrix(ColumnWiseMatrix rhs)
@@ -230,9 +245,44 @@ namespace CudaLightSharp.Buffers
 
         #endregion
 
+        public void Set(Vector vector, int col)
+        {
+            columns[col].ReadFrom(vector);
+        }
+
+        public void Set<T>(uint col, T value) where T : struct, IEquatable<T>, IFormattable
+        {
+            columns[col].Set(value);
+        }
+
+        public Vector<T> Get<T>(int col) where T : struct, IEquatable<T>, IFormattable
+        {
+            return columns[col].Get<T>();
+        }
+
         public Matrix<T> GetMatrix<T>() where T : struct, IEquatable<T>, IFormattable
         {
             return Matrix<T>.Build.DenseOfColumnMajor(nRows, nCols, Get<T>());
+        }
+
+        public void ColumnLinSpace<T>(int col, T x0, T x1) where T : struct, IEquatable<T>, IFormattable, IComparable
+        {
+            if (x0.CompareTo(x1) < 0)
+                columns[col].LinSpace(x0, x1);
+            else if (x0.CompareTo(x1) > 0)
+                columns[col].LinSpace(x1, x0);
+            else
+                throw new NotSupportedException();
+        }
+
+        public void ColumnRandomUniform(uint col, int seed = 1234)
+        {
+            columns[col].RandomUniform(seed);
+        }
+
+        public void ColumnRandomGaussian(uint col, int seed = 1234)
+        {
+            columns[col].RandomGaussian(seed);
         }
 
         public static ColumnWiseMatrix LinSpace(int nRows, int nCols, double x0, double x1, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
@@ -290,5 +340,16 @@ namespace CudaLightSharp.Buffers
 
         public readonly int nRows;
         public readonly int nCols;
+
+        public Vector Column(int i) { return columns[i]; }
+
+        public Vector<T> GetColumn<T>(int i) where T : struct, IEquatable<T>, IFormattable
+        {
+            return columns[i].Get<T>();
+        }
+
+        MemoryTile _buffer;
+        internal override MemoryBuffer buffer => _buffer;
+        internal readonly Vector[] columns;
     }
 }
