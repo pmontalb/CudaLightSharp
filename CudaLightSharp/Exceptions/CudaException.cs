@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CudaLightSharp.Exceptions
 {
+    [Serializable]
     internal class CudaGenericKernelException : Exception
     {
         public CudaGenericKernelException(string kernelName, int errorCode = -1)
@@ -16,6 +17,7 @@ namespace CudaLightSharp.Exceptions
 
     #region Cuda Exception mapping
 
+    [Serializable]
     internal class CudaErrorMissingConfigurationException : Exception
     {
         public CudaErrorMissingConfigurationException(string kernelName) : base(kernelName)
@@ -27,7 +29,8 @@ namespace CudaLightSharp.Exceptions
     * The API call failed because it was unable to allocate enough memory to
     * perform the requested operation.
 	*/
-    internal class CudaErrorMemoryAllocationException : Exception
+    [Serializable]
+	internal class CudaErrorMemoryAllocationException : Exception
     {
         public CudaErrorMemoryAllocationException(string kernelName) : base(kernelName)
         {
@@ -38,7 +41,8 @@ namespace CudaLightSharp.Exceptions
     * The API call failed because the CUDA driver and runtime could not be
     * initialized.
 	*/
-    internal class CudaErrorInitializationErrorException : Exception
+    [Serializable]
+	internal class CudaErrorInitializationErrorException : Exception
     {
         public CudaErrorInitializationErrorException(string kernelName) : base(kernelName)
         {
@@ -53,7 +57,8 @@ namespace CudaLightSharp.Exceptions
     * are invalid and must be reconstructed if the program is to continue
     * using CUDA.
 	*/
-    internal class CudaErrorLaunchFailureException : Exception
+    [Serializable]
+	internal class CudaErrorLaunchFailureException : Exception
     {
         public CudaErrorLaunchFailureException(string kernelName) : base(kernelName)
         {
@@ -67,7 +72,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 3.1. Device emulation mode was
     * removed with the CUDA 3.1 release.
 	*/
-    internal class CudaErrorPriorLaunchFailureException : Exception
+    [Serializable]
+	internal class CudaErrorPriorLaunchFailureException : Exception
     {
         public CudaErrorPriorLaunchFailureException(string kernelName) : base(kernelName)
         {
@@ -83,7 +89,8 @@ namespace CudaLightSharp.Exceptions
     * will return the same error. To continue using CUDA, the process must be terminated
     * and relaunched.
 	*/
-    internal class CudaErrorLaunchTimeoutException : Exception
+    [Serializable]
+	internal class CudaErrorLaunchTimeoutException : Exception
     {
         public CudaErrorLaunchTimeoutException(string kernelName) : base(kernelName)
         {
@@ -97,7 +104,8 @@ namespace CudaLightSharp.Exceptions
     * user has attempted to pass too many arguments to the device kernel, or the
     * kernel launch specifies too many threads for the kernel's register count.
 	*/
-    internal class CudaErrorLaunchOutOfResourcesException : Exception
+    [Serializable]
+	internal class CudaErrorLaunchOutOfResourcesException : Exception
     {
         public CudaErrorLaunchOutOfResourcesException(string kernelName) : base(kernelName)
         {
@@ -108,7 +116,8 @@ namespace CudaLightSharp.Exceptions
     * The requested device function does not exist or is not compiled for the
     * proper device architecture.
 	*/
-    internal class CudaErrorInvalidDeviceFunctionException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidDeviceFunctionException : Exception
     {
         public CudaErrorInvalidDeviceFunctionException(string kernelName) : base(kernelName)
         {
@@ -122,7 +131,8 @@ namespace CudaLightSharp.Exceptions
     * requesting too many threads or blocks. See ::cudaDeviceProp for more
     * device limitations.
 	*/
-    internal class CudaErrorInvalidConfigurationException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidConfigurationException : Exception
     {
         public CudaErrorInvalidConfigurationException(string kernelName) : base(kernelName)
         {
@@ -133,7 +143,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that the device ordinal supplied by the user does not
     * correspond to a valid CUDA device.
 	*/
-    internal class CudaErrorInvalidDeviceException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidDeviceException : Exception
     {
         public CudaErrorInvalidDeviceException(string kernelName) : base(kernelName)
         {
@@ -144,7 +155,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that one or more of the parameters passed to the API call
     * is not within an acceptable range of values.
 	*/
-    internal class CudaErrorInvalidValueException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidValueException : Exception
     {
         public CudaErrorInvalidValueException(string kernelName) : base(kernelName)
         {
@@ -155,7 +167,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that one or more of the pitch-related parameters passed
     * to the API call is not within the acceptable range for pitch.
 	*/
-    internal class CudaErrorInvalidPitchValueException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidPitchValueException : Exception
     {
         public CudaErrorInvalidPitchValueException(string kernelName) : base(kernelName)
         {
@@ -166,7 +179,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that the symbol name/identifier passed to the API call
     * is not a valid name or identifier.
 	*/
-    internal class CudaErrorInvalidSymbolException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidSymbolException : Exception
     {
         public CudaErrorInvalidSymbolException(string kernelName) : base(kernelName)
         {
@@ -176,7 +190,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates that the buffer object could not be mapped.
 	*/
-    internal class CudaErrorMapBufferObjectFailedException : Exception
+    [Serializable]
+	internal class CudaErrorMapBufferObjectFailedException : Exception
     {
         public CudaErrorMapBufferObjectFailedException(string kernelName) : base(kernelName)
         {
@@ -186,7 +201,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates that the buffer object could not be unmapped.
 	*/
-    internal class CudaErrorUnmapBufferObjectFailedException : Exception
+    [Serializable]
+	internal class CudaErrorUnmapBufferObjectFailedException : Exception
     {
         public CudaErrorUnmapBufferObjectFailedException(string kernelName) : base(kernelName)
         {
@@ -197,7 +213,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that at least one host pointer passed to the API call is
     * not a valid host pointer.
 	*/
-    internal class CudaErrorInvalidHostPointerException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidHostPointerException : Exception
     {
         public CudaErrorInvalidHostPointerException(string kernelName) : base(kernelName)
         {
@@ -208,7 +225,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that at least one device pointer passed to the API call is
     * not a valid device pointer.
 	*/
-    internal class CudaErrorInvalidDevicePointerException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidDevicePointerException : Exception
     {
         public CudaErrorInvalidDevicePointerException(string kernelName) : base(kernelName)
         {
@@ -219,7 +237,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that the texture passed to the API call is not a valid
     * texture.
 	*/
-    internal class CudaErrorInvalidTextureException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidTextureException : Exception
     {
         public CudaErrorInvalidTextureException(string kernelName) : base(kernelName)
         {
@@ -230,7 +249,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that the texture binding is not valid. This occurs if you
     * call ::cudaGetTextureAlignmentOffset() with an unbound texture.
 	*/
-    internal class CudaErrorInvalidTextureBindingException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidTextureBindingException : Exception
     {
         public CudaErrorInvalidTextureBindingException(string kernelName) : base(kernelName)
         {
@@ -242,7 +262,8 @@ namespace CudaLightSharp.Exceptions
     * valid. This occurs if the format is not one of the formats specified by
     * ::cudaChannelFormatKind, or if one of the dimensions is invalid.
 	*/
-    internal class CudaErrorInvalidChannelDescriptorException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidChannelDescriptorException : Exception
     {
         public CudaErrorInvalidChannelDescriptorException(string kernelName) : base(kernelName)
         {
@@ -253,7 +274,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that the direction of the memcpy passed to the API call is
     * not one of the types specified by ::cudaMemcpyKind.
 	*/
-    internal class CudaErrorInvalidMemcpyDirectionException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidMemcpyDirectionException : Exception
     {
         public CudaErrorInvalidMemcpyDirectionException(string kernelName) : base(kernelName)
         {
@@ -268,7 +290,8 @@ namespace CudaLightSharp.Exceptions
     * memory may now have their address taken by the runtime via
     * ::cudaGetSymbolAddress().
 	*/
-    internal class CudaErrorAddressOfConstantException : Exception
+    [Serializable]
+	internal class CudaErrorAddressOfConstantException : Exception
     {
         public CudaErrorAddressOfConstantException(string kernelName) : base(kernelName)
         {
@@ -282,7 +305,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 3.1. Device emulation mode was
     * removed with the CUDA 3.1 release.
 	*/
-    internal class CudaErrorTextureFetchFailedException : Exception
+    [Serializable]
+	internal class CudaErrorTextureFetchFailedException : Exception
     {
         public CudaErrorTextureFetchFailedException(string kernelName) : base(kernelName)
         {
@@ -296,7 +320,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 3.1. Device emulation mode was
     * removed with the CUDA 3.1 release.
 	*/
-    internal class CudaErrorTextureNotBoundException : Exception
+    [Serializable]
+	internal class CudaErrorTextureNotBoundException : Exception
     {
         public CudaErrorTextureNotBoundException(string kernelName) : base(kernelName)
         {
@@ -310,7 +335,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 3.1. Device emulation mode was
     * removed with the CUDA 3.1 release.
 	*/
-    internal class CudaErrorSynchronizationErrorException : Exception
+    [Serializable]
+	internal class CudaErrorSynchronizationErrorException : Exception
     {
         public CudaErrorSynchronizationErrorException(string kernelName) : base(kernelName)
         {
@@ -321,7 +347,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that a non-float texture was being accessed with linear
     * filtering. This is not supported by CUDA.
 	*/
-    internal class CudaErrorInvalidFilterSettingException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidFilterSettingException : Exception
     {
         public CudaErrorInvalidFilterSettingException(string kernelName) : base(kernelName)
         {
@@ -332,7 +359,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that an attempt was made to read a non-float texture as a
     * normalized float. This is not supported by CUDA.
 	*/
-    internal class CudaErrorInvalidNormSettingException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidNormSettingException : Exception
     {
         public CudaErrorInvalidNormSettingException(string kernelName) : base(kernelName)
         {
@@ -345,7 +373,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 3.1. Device emulation mode was
     * removed with the CUDA 3.1 release.
 	*/
-    internal class CudaErrorMixedDeviceExecutionException : Exception
+    [Serializable]
+	internal class CudaErrorMixedDeviceExecutionException : Exception
     {
         public CudaErrorMixedDeviceExecutionException(string kernelName) : base(kernelName)
         {
@@ -357,7 +386,8 @@ namespace CudaLightSharp.Exceptions
     * it is being called during process shut down, at a point in time after
     * CUDA driver has been unloaded.
 	*/
-    internal class CudaErrorCudartUnloadingException : Exception
+    [Serializable]
+	internal class CudaErrorCudartUnloadingException : Exception
     {
         public CudaErrorCudartUnloadingException(string kernelName) : base(kernelName)
         {
@@ -367,7 +397,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates that an unknown internal error has occurred.
 	*/
-    internal class CudaErrorUnknownException : Exception
+    [Serializable]
+	internal class CudaErrorUnknownException : Exception
     {
         public CudaErrorUnknownException(string kernelName) : base(kernelName)
         {
@@ -380,7 +411,8 @@ namespace CudaLightSharp.Exceptions
     * \deprecated
     * This error return is deprecated as of CUDA 4.1.
 	*/
-    internal class CudaErrorNotYetImplementedException : Exception
+    [Serializable]
+	internal class CudaErrorNotYetImplementedException : Exception
     {
         public CudaErrorNotYetImplementedException(string kernelName) : base(kernelName)
         {
@@ -394,7 +426,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 3.1. Device emulation mode was
     * removed with the CUDA 3.1 release.
 	*/
-    internal class CudaErrorMemoryValueTooLargeException : Exception
+    [Serializable]
+	internal class CudaErrorMemoryValueTooLargeException : Exception
     {
         public CudaErrorMemoryValueTooLargeException(string kernelName) : base(kernelName)
         {
@@ -406,7 +439,8 @@ namespace CudaLightSharp.Exceptions
     * valid. Resource handles are opaque types like ::cudaStream_t and
     * ::cudaEvent_t.
 	*/
-    internal class CudaErrorInvalidResourceHandleException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidResourceHandleException : Exception
     {
         public CudaErrorInvalidResourceHandleException(string kernelName) : base(kernelName)
         {
@@ -419,7 +453,8 @@ namespace CudaLightSharp.Exceptions
     * differently than ::cudaSuccess (which indicates completion). Calls that
     * may return this value include ::cudaEventQuery() and ::cudaStreamQuery().
 	*/
-    internal class CudaErrorNotReadyException : Exception
+    [Serializable]
+	internal class CudaErrorNotReadyException : Exception
     {
         public CudaErrorNotReadyException(string kernelName) : base(kernelName)
         {
@@ -431,7 +466,8 @@ namespace CudaLightSharp.Exceptions
     * CUDA runtime library. This is not a supported configuration. Users should
     * install an updated NVIDIA display driver to allow the application to run.
 	*/
-    internal class CudaErrorInsufficientDriverException : Exception
+    [Serializable]
+	internal class CudaErrorInsufficientDriverException : Exception
     {
         public CudaErrorInsufficientDriverException(string kernelName) : base(kernelName)
         {
@@ -449,7 +485,8 @@ namespace CudaLightSharp.Exceptions
     * interoperability and there is an existing ::CUcontext active on the
     * host thread.
 	*/
-    internal class CudaErrorSetOnActiveProcessException : Exception
+    [Serializable]
+	internal class CudaErrorSetOnActiveProcessException : Exception
     {
         public CudaErrorSetOnActiveProcessException(string kernelName) : base(kernelName)
         {
@@ -460,7 +497,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that the surface passed to the API call is not a valid
     * surface.
 	*/
-    internal class CudaErrorInvalidSurfaceException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidSurfaceException : Exception
     {
         public CudaErrorInvalidSurfaceException(string kernelName) : base(kernelName)
         {
@@ -471,7 +509,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that no CUDA-capable devices were detected by the installed
     * CUDA driver.
 	*/
-    internal class CudaErrorNoDeviceException : Exception
+    [Serializable]
+	internal class CudaErrorNoDeviceException : Exception
     {
         public CudaErrorNoDeviceException(string kernelName) : base(kernelName)
         {
@@ -482,7 +521,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that an uncorrectable ECC error was detected during
     * execution.
 	*/
-    internal class CudaErrorECCUncorrectableException : Exception
+    [Serializable]
+	internal class CudaErrorECCUncorrectableException : Exception
     {
         public CudaErrorECCUncorrectableException(string kernelName) : base(kernelName)
         {
@@ -492,7 +532,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates that a link to a shared object failed to resolve.
 	*/
-    internal class CudaErrorSharedObjectSymbolNotFoundException : Exception
+    [Serializable]
+	internal class CudaErrorSharedObjectSymbolNotFoundException : Exception
     {
         public CudaErrorSharedObjectSymbolNotFoundException(string kernelName) : base(kernelName)
         {
@@ -502,7 +543,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates that initialization of a shared object failed.
 	*/
-    internal class CudaErrorSharedObjectInitFailedException : Exception
+    [Serializable]
+	internal class CudaErrorSharedObjectInitFailedException : Exception
     {
         public CudaErrorSharedObjectInitFailedException(string kernelName) : base(kernelName)
         {
@@ -513,7 +555,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that the ::cudaLimit passed to the API call is not
     * supported by the active device.
 	*/
-    internal class CudaErrorUnsupportedLimitException : Exception
+    [Serializable]
+	internal class CudaErrorUnsupportedLimitException : Exception
     {
         public CudaErrorUnsupportedLimitException(string kernelName) : base(kernelName)
         {
@@ -524,7 +567,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that multiple global or constant variables (across separate
     * CUDA source files in the application) share the same string name.
 	*/
-    internal class CudaErrorDuplicateVariableNameException : Exception
+    [Serializable]
+	internal class CudaErrorDuplicateVariableNameException : Exception
     {
         public CudaErrorDuplicateVariableNameException(string kernelName) : base(kernelName)
         {
@@ -535,7 +579,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that multiple textures (across separate CUDA source
     * files in the application) share the same string name.
 	*/
-    internal class CudaErrorDuplicateTextureNameException : Exception
+    [Serializable]
+	internal class CudaErrorDuplicateTextureNameException : Exception
     {
         public CudaErrorDuplicateTextureNameException(string kernelName) : base(kernelName)
         {
@@ -546,7 +591,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that multiple surfaces (across separate CUDA source
     * files in the application) share the same string name.
 	*/
-    internal class CudaErrorDuplicateSurfaceNameException : Exception
+    [Serializable]
+	internal class CudaErrorDuplicateSurfaceNameException : Exception
     {
         public CudaErrorDuplicateSurfaceNameException(string kernelName) : base(kernelName)
         {
@@ -561,7 +607,8 @@ namespace CudaLightSharp.Exceptions
     * from starting. They can also be unavailable due to memory constraints
     * on a device that already has active CUDA work being performed.
 	*/
-    internal class CudaErrorDevicesUnavailableException : Exception
+    [Serializable]
+	internal class CudaErrorDevicesUnavailableException : Exception
     {
         public CudaErrorDevicesUnavailableException(string kernelName) : base(kernelName)
         {
@@ -571,7 +618,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates that the device kernel image is invalid.
 	*/
-    internal class CudaErrorInvalidKernelImageException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidKernelImageException : Exception
     {
         public CudaErrorInvalidKernelImageException(string kernelName) : base(kernelName)
         {
@@ -584,7 +632,8 @@ namespace CudaLightSharp.Exceptions
     * options for a particular CUDA source file that do not include the
     * corresponding device configuration.
 	*/
-    internal class CudaErrorNoKernelImageForDeviceException : Exception
+    [Serializable]
+	internal class CudaErrorNoKernelImageForDeviceException : Exception
     {
         public CudaErrorNoKernelImageForDeviceException(string kernelName) : base(kernelName)
         {
@@ -602,7 +651,8 @@ namespace CudaLightSharp.Exceptions
     * context has been destroyed. Please see \ref CUDART_DRIVER Interactions
     * with the CUDA Driver API for more information.
 	*/
-    internal class CudaErrorIncompatibleDriverContextException : Exception
+    [Serializable]
+	internal class CudaErrorIncompatibleDriverContextException : Exception
     {
         public CudaErrorIncompatibleDriverContextException(string kernelName) : base(kernelName)
         {
@@ -614,7 +664,8 @@ namespace CudaLightSharp.Exceptions
     * trying to re-enable peer addressing on from a context which has already
     * had peer addressing enabled.
 	*/
-    internal class CudaErrorPeerAccessAlreadyEnabledException : Exception
+    [Serializable]
+	internal class CudaErrorPeerAccessAlreadyEnabledException : Exception
     {
         public CudaErrorPeerAccessAlreadyEnabledException(string kernelName) : base(kernelName)
         {
@@ -626,7 +677,8 @@ namespace CudaLightSharp.Exceptions
     * disable peer addressing which has not been enabled yet via
     * ::cudaDeviceEnablePeerAccess().
 	*/
-    internal class CudaErrorPeerAccessNotEnabledException : Exception
+    [Serializable]
+	internal class CudaErrorPeerAccessNotEnabledException : Exception
     {
         public CudaErrorPeerAccessNotEnabledException(string kernelName) : base(kernelName)
         {
@@ -637,7 +689,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that a call tried to access an exclusive-thread device that
     * is already in use by a different thread.
 	*/
-    internal class CudaErrorDeviceAlreadyInUseException : Exception
+    [Serializable]
+	internal class CudaErrorDeviceAlreadyInUseException : Exception
     {
         public CudaErrorDeviceAlreadyInUseException(string kernelName) : base(kernelName)
         {
@@ -649,7 +702,8 @@ namespace CudaLightSharp.Exceptions
     * happen when the application is running with external profiling tools
     * like visual profiler.
 	*/
-    internal class CudaErrorProfilerDisabledException : Exception
+    [Serializable]
+	internal class CudaErrorProfilerDisabledException : Exception
     {
         public CudaErrorProfilerDisabledException(string kernelName) : base(kernelName)
         {
@@ -662,7 +716,8 @@ namespace CudaLightSharp.Exceptions
     * to attempt to enable/disable the profiling via ::cudaProfilerStart or
     * ::cudaProfilerStop without initialization.
 	*/
-    internal class CudaErrorProfilerNotInitializedException : Exception
+    [Serializable]
+	internal class CudaErrorProfilerNotInitializedException : Exception
     {
         public CudaErrorProfilerNotInitializedException(string kernelName) : base(kernelName)
         {
@@ -674,7 +729,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 5.0. It is no longer an error
     * to call cudaProfilerStart() when profiling is already enabled.
 	*/
-    internal class CudaErrorProfilerAlreadyStartedException : Exception
+    [Serializable]
+	internal class CudaErrorProfilerAlreadyStartedException : Exception
     {
         public CudaErrorProfilerAlreadyStartedException(string kernelName) : base(kernelName)
         {
@@ -686,7 +742,8 @@ namespace CudaLightSharp.Exceptions
     * This error return is deprecated as of CUDA 5.0. It is no longer an error
     * to call cudaProfilerStop() when profiling is already disabled.
 	*/
-    internal class CudaErrorProfilerAlreadyStoppedException : Exception
+    [Serializable]
+	internal class CudaErrorProfilerAlreadyStoppedException : Exception
     {
         public CudaErrorProfilerAlreadyStoppedException(string kernelName) : base(kernelName)
         {
@@ -699,7 +756,8 @@ namespace CudaLightSharp.Exceptions
     * allocations are invalid and must be reconstructed if the program is to
     * continue using CUDA.
 	*/
-    internal class CudaErrorAssertException : Exception
+    [Serializable]
+	internal class CudaErrorAssertException : Exception
     {
         public CudaErrorAssertException(string kernelName) : base(kernelName)
         {
@@ -711,7 +769,8 @@ namespace CudaLightSharp.Exceptions
     * peer access have been exhausted for one or more of the devices
     * passed to ::cudaEnablePeerAccess().
 	*/
-    internal class CudaErrorTooManyPeersException : Exception
+    [Serializable]
+	internal class CudaErrorTooManyPeersException : Exception
     {
         public CudaErrorTooManyPeersException(string kernelName) : base(kernelName)
         {
@@ -722,7 +781,8 @@ namespace CudaLightSharp.Exceptions
     * This error indicates that the memory range passed to ::cudaHostRegister()
     * has already been registered.
 	*/
-    internal class CudaErrorHostMemoryAlreadyRegisteredException : Exception
+    [Serializable]
+	internal class CudaErrorHostMemoryAlreadyRegisteredException : Exception
     {
         public CudaErrorHostMemoryAlreadyRegisteredException(string kernelName) : base(kernelName)
         {
@@ -733,7 +793,8 @@ namespace CudaLightSharp.Exceptions
     * This error indicates that the pointer passed to ::cudaHostUnregister()
     * does not correspond to any currently registered memory region.
 	*/
-    internal class CudaErrorHostMemoryNotRegisteredException : Exception
+    [Serializable]
+	internal class CudaErrorHostMemoryNotRegisteredException : Exception
     {
         public CudaErrorHostMemoryNotRegisteredException(string kernelName) : base(kernelName)
         {
@@ -743,7 +804,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This error indicates that an OS call failed.
 	*/
-    internal class CudaErrorOperatingSystemException : Exception
+    [Serializable]
+	internal class CudaErrorOperatingSystemException : Exception
     {
         public CudaErrorOperatingSystemException(string kernelName) : base(kernelName)
         {
@@ -754,7 +816,8 @@ namespace CudaLightSharp.Exceptions
     * This error indicates that P2P access is not supported across the given
     * devices.
 	*/
-    internal class CudaErrorPeerAccessUnsupportedException : Exception
+    [Serializable]
+	internal class CudaErrorPeerAccessUnsupportedException : Exception
     {
         public CudaErrorPeerAccessUnsupportedException(string kernelName) : base(kernelName)
         {
@@ -766,7 +829,8 @@ namespace CudaLightSharp.Exceptions
     * because the depth of the child grid would exceed the maximum supported
     * number of nested grid launches.
 	*/
-    internal class CudaErrorLaunchMaxDepthExceededException : Exception
+    [Serializable]
+	internal class CudaErrorLaunchMaxDepthExceededException : Exception
     {
         public CudaErrorLaunchMaxDepthExceededException(string kernelName) : base(kernelName)
         {
@@ -779,7 +843,8 @@ namespace CudaLightSharp.Exceptions
     * Kernels launched via the device runtime only support textures created with
     * the Texture Object API's.
 	*/
-    internal class CudaErrorLaunchFileScopedTexException : Exception
+    [Serializable]
+	internal class CudaErrorLaunchFileScopedTexException : Exception
     {
         public CudaErrorLaunchFileScopedTexException(string kernelName) : base(kernelName)
         {
@@ -792,7 +857,8 @@ namespace CudaLightSharp.Exceptions
     * Kernels launched via the device runtime only support surfaces created with
     * the Surface Object API's.
 	*/
-    internal class CudaErrorLaunchFileScopedSurfException : Exception
+    [Serializable]
+	internal class CudaErrorLaunchFileScopedSurfException : Exception
     {
         public CudaErrorLaunchFileScopedSurfException(string kernelName) : base(kernelName)
         {
@@ -812,7 +878,8 @@ namespace CudaLightSharp.Exceptions
     * to reserve large amounts of device memory that cannot be used for
     * user allocations.
 	*/
-    internal class CudaErrorSyncDepthExceededException : Exception
+    [Serializable]
+	internal class CudaErrorSyncDepthExceededException : Exception
     {
         public CudaErrorSyncDepthExceededException(string kernelName) : base(kernelName)
         {
@@ -829,7 +896,8 @@ namespace CudaLightSharp.Exceptions
     * runtime launches will require the runtime to reserve device memory that
     * cannot be used for user allocations.
 	*/
-    internal class CudaErrorLaunchPendingCountExceededException : Exception
+    [Serializable]
+	internal class CudaErrorLaunchPendingCountExceededException : Exception
     {
         public CudaErrorLaunchPendingCountExceededException(string kernelName) : base(kernelName)
         {
@@ -839,7 +907,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This error indicates the attempted operation is not permitted.
 	*/
-    internal class CudaErrorNotPermittedException : Exception
+    [Serializable]
+	internal class CudaErrorNotPermittedException : Exception
     {
         public CudaErrorNotPermittedException(string kernelName) : base(kernelName)
         {
@@ -850,7 +919,8 @@ namespace CudaLightSharp.Exceptions
     * This error indicates the attempted operation is not supported
     * on the current system or device.
 	*/
-    internal class CudaErrorNotSupportedException : Exception
+    [Serializable]
+	internal class CudaErrorNotSupportedException : Exception
     {
         public CudaErrorNotSupportedException(string kernelName) : base(kernelName)
         {
@@ -864,7 +934,8 @@ namespace CudaLightSharp.Exceptions
     * will return the same error. To continue using CUDA, the process must be terminated
     * and relaunched.
 	*/
-    internal class CudaErrorHardwareStackErrorException : Exception
+    [Serializable]
+	internal class CudaErrorHardwareStackErrorException : Exception
     {
         public CudaErrorHardwareStackErrorException(string kernelName) : base(kernelName)
         {
@@ -877,7 +948,8 @@ namespace CudaLightSharp.Exceptions
     * will return the same error. To continue using CUDA, the process must be terminated
     * and relaunched.
 	*/
-    internal class CudaErrorIllegalInstructionException : Exception
+    [Serializable]
+	internal class CudaErrorIllegalInstructionException : Exception
     {
         public CudaErrorIllegalInstructionException(string kernelName) : base(kernelName)
         {
@@ -891,7 +963,8 @@ namespace CudaLightSharp.Exceptions
     * will return the same error. To continue using CUDA, the process must be terminated
     * and relaunched.
 	*/
-    internal class CudaErrorMisalignedAddressException : Exception
+    [Serializable]
+	internal class CudaErrorMisalignedAddressException : Exception
     {
         public CudaErrorMisalignedAddressException(string kernelName) : base(kernelName)
         {
@@ -907,7 +980,8 @@ namespace CudaLightSharp.Exceptions
     * will return the same error. To continue using CUDA, the process must be terminated
     * and relaunched.
 	*/
-    internal class CudaErrorInvalidAddressSpaceException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidAddressSpaceException : Exception
     {
         public CudaErrorInvalidAddressSpaceException(string kernelName) : base(kernelName)
         {
@@ -920,7 +994,8 @@ namespace CudaLightSharp.Exceptions
     * will return the same error. To continue using CUDA, the process must be terminated
     * and relaunched.
 	*/
-    internal class CudaErrorInvalidPcException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidPcException : Exception
     {
         public CudaErrorInvalidPcException(string kernelName) : base(kernelName)
         {
@@ -933,7 +1008,8 @@ namespace CudaLightSharp.Exceptions
     * will return the same error. To continue using CUDA, the process must be terminated
     * and relaunched.
 	*/
-    internal class CudaErrorIllegalAddressException : Exception
+    [Serializable]
+	internal class CudaErrorIllegalAddressException : Exception
     {
         public CudaErrorIllegalAddressException(string kernelName) : base(kernelName)
         {
@@ -944,7 +1020,8 @@ namespace CudaLightSharp.Exceptions
     * A PTX compilation failed. The runtime may fall back to compiling PTX if
     * an application does not contain a suitable binary for the current device.
 	*/
-    internal class CudaErrorInvalidPtxException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidPtxException : Exception
     {
         public CudaErrorInvalidPtxException(string kernelName) : base(kernelName)
         {
@@ -954,7 +1031,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates an error with the OpenGL or DirectX context.
 	*/
-    internal class CudaErrorInvalidGraphicsContextException : Exception
+    [Serializable]
+	internal class CudaErrorInvalidGraphicsContextException : Exception
     {
         public CudaErrorInvalidGraphicsContextException(string kernelName) : base(kernelName)
         {
@@ -965,7 +1043,8 @@ namespace CudaLightSharp.Exceptions
     * This indicates that an uncorrectable NVLink error was detected during the
     * execution.
 	*/
-    internal class CudaErrorNvlinkUncorrectableException : Exception
+    [Serializable]
+	internal class CudaErrorNvlinkUncorrectableException : Exception
     {
         public CudaErrorNvlinkUncorrectableException(string kernelName) : base(kernelName)
         {
@@ -977,7 +1056,8 @@ namespace CudaLightSharp.Exceptions
     * library is used for PTX compilation. The runtime may fall back to compiling PTX
     * if an application does not contain a suitable binary for the current device.
 	*/
-    internal class CudaErrorJitCompilerNotFoundException : Exception
+    [Serializable]
+	internal class CudaErrorJitCompilerNotFoundException : Exception
     {
         public CudaErrorJitCompilerNotFoundException(string kernelName) : base(kernelName)
         {
@@ -991,7 +1071,8 @@ namespace CudaLightSharp.Exceptions
     * or ::cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags times the number of multiprocessors
     * as specified by the device attribute ::cudaDevAttrMultiProcessorCount.
 	*/
-    internal class CudaErrorCooperativeLaunchTooLargeException : Exception
+    [Serializable]
+	internal class CudaErrorCooperativeLaunchTooLargeException : Exception
     {
         public CudaErrorCooperativeLaunchTooLargeException(string kernelName) : base(kernelName)
         {
@@ -1001,7 +1082,8 @@ namespace CudaLightSharp.Exceptions
     /**
     * This indicates an internal startup failure in the CUDA runtime.
 	*/
-    internal class CudaErrorStartupFailureException : Exception
+    [Serializable]
+	internal class CudaErrorStartupFailureException : Exception
     {
         public CudaErrorStartupFailureException(string kernelName) : base(kernelName)
         {
@@ -1014,7 +1096,8 @@ namespace CudaLightSharp.Exceptions
     * \deprecated
     * This error return is deprecated as of CUDA 4.1.
 	*/
-    internal class CudaErrorApiFailureBaseException : Exception
+    [Serializable]
+	internal class CudaErrorApiFailureBaseException : Exception
     {
         public CudaErrorApiFailureBaseException(string kernelName) : base(kernelName)
         {
@@ -1025,63 +1108,72 @@ namespace CudaLightSharp.Exceptions
 
     #region CuBlas Exception mapping
 
-    internal class CuBlasNotInitialisedException : Exception
+    [Serializable]
+	internal class CuBlasNotInitialisedException : Exception
     {
         public CuBlasNotInitialisedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasAllocFailedException : Exception
+    [Serializable]
+	internal class CuBlasAllocFailedException : Exception
     {
         public CuBlasAllocFailedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasInvalidValueException : Exception
+    [Serializable]
+	internal class CuBlasInvalidValueException : Exception
     {
         public CuBlasInvalidValueException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasArchMismatchException : Exception
+    [Serializable]
+	internal class CuBlasArchMismatchException : Exception
     {
         public CuBlasArchMismatchException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasMappingErrorException : Exception
+    [Serializable]
+	internal class CuBlasMappingErrorException : Exception
     {
         public CuBlasMappingErrorException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasExecutionFailedException : Exception
+    [Serializable]
+	internal class CuBlasExecutionFailedException : Exception
     {
         public CuBlasExecutionFailedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasInternalErrorException : Exception
+    [Serializable]
+	internal class CuBlasInternalErrorException : Exception
     {
         public CuBlasInternalErrorException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasNotSupportedException : Exception
+    [Serializable]
+	internal class CuBlasNotSupportedException : Exception
     {
         public CuBlasNotSupportedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuBlasLicenseErrorException : Exception
+    [Serializable]
+	internal class CuBlasLicenseErrorException : Exception
     {
         public CuBlasLicenseErrorException(string kernelName) : base(kernelName)
         {
@@ -1092,63 +1184,72 @@ namespace CudaLightSharp.Exceptions
 
     #region CuSparse Exception mapping
 
-    internal class CuSparseNotInitialisedException : Exception
+    [Serializable]
+	internal class CuSparseNotInitialisedException : Exception
     {
         public CuSparseNotInitialisedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseAllocFailedException : Exception
+    [Serializable]
+	internal class CuSparseAllocFailedException : Exception
     {
         public CuSparseAllocFailedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseInvalidValueException : Exception
+    [Serializable]
+	internal class CuSparseInvalidValueException : Exception
     {
         public CuSparseInvalidValueException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseArchMismatchException : Exception
+    [Serializable]
+	internal class CuSparseArchMismatchException : Exception
     {
         public CuSparseArchMismatchException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseMappingErrorException : Exception
+    [Serializable]
+	internal class CuSparseMappingErrorException : Exception
     {
         public CuSparseMappingErrorException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseExecutionFailedException : Exception
+    [Serializable]
+	internal class CuSparseExecutionFailedException : Exception
     {
         public CuSparseExecutionFailedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseInternalErrorException : Exception
+    [Serializable]
+	internal class CuSparseInternalErrorException : Exception
     {
         public CuSparseInternalErrorException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseMatrixTypeNotSupportedException : Exception
+    [Serializable]
+	internal class CuSparseMatrixTypeNotSupportedException : Exception
     {
         public CuSparseMatrixTypeNotSupportedException(string kernelName) : base(kernelName)
         {
         }
     };
 
-    internal class CuSparseZeroPivotException : Exception
+    [Serializable]
+	internal class CuSparseZeroPivotException : Exception
     {
         public CuSparseZeroPivotException(string kernelName) : base(kernelName)
         {

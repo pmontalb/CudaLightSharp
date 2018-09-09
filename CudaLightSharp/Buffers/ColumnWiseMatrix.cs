@@ -56,7 +56,7 @@ namespace CudaLightSharp.Buffers
             this.nCols = nCols;
 
             _buffer = new MemoryTile(0, (uint)nRows, (uint)nCols, memorySpace, mathDomain);
-            ctor(buffer);
+            ctor(_buffer);
 
             columns = new Vector[nCols];
             uint shift = _buffer.ElementarySize();
@@ -167,7 +167,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(rhs.buffer.pointer != 0);
 
             ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs.nRows, rhs.nCols, lhs.memorySpace, rhs.mathDomain);
-            CuBlasApi.Multiply(ret.buffer as MemoryTile, lhs.buffer as MemoryTile, rhs.buffer as MemoryTile, lhs.nRows, rhs.nRows, MatrixOperation.None, MatrixOperation.None, 1.0);
+            CuBlasApi.Multiply(ret._buffer, lhs._buffer, rhs._buffer, lhs.nRows, rhs.nRows, MatrixOperation.None, MatrixOperation.None, 1.0);
 
             return ret;
         }
@@ -181,7 +181,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(rhs.buffer.pointer != 0);
 
             ColumnWiseMatrix ret = new ColumnWiseMatrix(nRows, rhs.nCols, memorySpace, rhs.mathDomain);
-            CuBlasApi.Multiply(ret.buffer as MemoryTile, buffer as MemoryTile, rhs.buffer as MemoryTile, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
+            CuBlasApi.Multiply(ret._buffer, _buffer, rhs._buffer, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
 
             return ret;
         }
@@ -195,7 +195,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(rhs.buffer.pointer != 0);
 
             Vector ret = new Vector(rhs.Size, lhs.memorySpace, rhs.mathDomain);
-            CuBlasApi.Dot(ret.buffer, lhs.buffer as MemoryTile, rhs.buffer, MatrixOperation.None, 1.0);
+            CuBlasApi.Dot(ret.buffer, lhs._buffer, rhs.buffer, MatrixOperation.None, 1.0);
 
             return ret;
         }
@@ -209,7 +209,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(rhs.buffer.pointer != 0);
 
             Vector ret = new Vector(rhs.Size, memorySpace, rhs.mathDomain);
-            CuBlasApi.Dot(ret.buffer, buffer as MemoryTile, rhs.buffer, lhsOperation, alpha);
+            CuBlasApi.Dot(ret.buffer, _buffer, rhs.buffer, lhsOperation, alpha);
 
             return ret;
         }
@@ -219,7 +219,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(nRows == nCols);
             Debug.Assert(buffer.pointer != 0);
             
-            CuBlasApi.Invert(buffer as MemoryTile, operation);            
+            CuBlasApi.Invert(_buffer, operation);            
         }
 
         public void Solve(ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None)
@@ -227,12 +227,12 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(nRows == nCols);
             Debug.Assert(buffer.pointer != 0);
 
-            CuBlasApi.Solve(buffer as MemoryTile, rhs.buffer as MemoryTile, lhsOperation);
+            CuBlasApi.Solve(_buffer, rhs._buffer, lhsOperation);
         }
 
         public void MakeIdentity()
         {
-            CuBlasApi.Eye(buffer as MemoryTile);
+            CuBlasApi.Eye(_buffer);
         }
 
         public static ColumnWiseMatrix Eye(int nRows, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)

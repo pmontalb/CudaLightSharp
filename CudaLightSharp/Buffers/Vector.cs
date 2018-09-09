@@ -37,7 +37,7 @@ namespace CudaLightSharp.Buffers
             : base(true, memorySpace, mathDomain)
         {
             _buffer = new MemoryBuffer(0, (uint)size, memorySpace, mathDomain);
-            ctor(buffer);
+            ctor(_buffer);
         }
 
         public Vector(int size, double value, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
@@ -130,6 +130,28 @@ namespace CudaLightSharp.Buffers
             ElementWiseProduct(tmp.buffer, rhs.buffer);
 
             return tmp;
+        }
+
+        public static Vector Add(Vector lhs, Vector rhs, double alpha = 1.0)
+        {
+            Vector ret = new Vector(lhs);
+            ret.AddEqual(rhs, alpha);
+
+            return ret;
+        }
+
+        public static Vector Subtract(Vector lhs, Vector rhs)
+        {
+            Vector ret = new Vector(lhs);
+            ret.SubtractEqual(rhs);
+
+            return ret;
+        }
+
+        public static Vector ElementWiseProduct(Vector lhs, Vector rhs)
+        {
+            Vector ret = lhs % rhs;
+            return ret;
         }
 
         #endregion

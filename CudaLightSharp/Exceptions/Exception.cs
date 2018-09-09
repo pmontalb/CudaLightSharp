@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CudaLightSharp.Exceptions
 {
+    [Serializable]
     internal class InternalErrorException : Exception
     {
         public InternalErrorException(string message = "")
@@ -14,6 +15,7 @@ namespace CudaLightSharp.Exceptions
         }
     };
 
+    [Serializable]
     internal class ExpectedEvenSizeException : Exception
     {
         public ExpectedEvenSizeException(string message = "")
@@ -22,6 +24,7 @@ namespace CudaLightSharp.Exceptions
         }
     };
 
+    [Serializable]
     internal class NotSupportedException : Exception
     {
         public NotSupportedException(string message = "")
@@ -30,6 +33,7 @@ namespace CudaLightSharp.Exceptions
         }
     };
 
+    [Serializable]
     internal class NotImplementedException : Exception
     {
         public NotImplementedException(string message = "")
@@ -38,6 +42,7 @@ namespace CudaLightSharp.Exceptions
         }
     };
 
+    [Serializable]
     internal class BufferNotInitialisedException : Exception
     {
         public BufferNotInitialisedException(string message = "")
