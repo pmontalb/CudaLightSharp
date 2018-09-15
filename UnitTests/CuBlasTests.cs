@@ -135,5 +135,83 @@ namespace UnitTests
                 }
             }
         }
+
+        [TestMethod]
+        public void Dot()
+        {
+            ColumnWiseMatrix m1 = new ColumnWiseMatrix(10, 10, 1.2345f);
+            DeviceManager.CheckDeviceSanity();
+            var _m1 = m1.GetMatrix<float>();
+
+            Vector v1 = new Vector(10, 9.8765f);
+            DeviceManager.CheckDeviceSanity();
+            var _v1 = v1.Get<float>();
+
+            var v2 = m1 * v1;
+            DeviceManager.CheckDeviceSanity();
+            var _v2 = v2.Get<float>();
+
+            for (int i = 0; i < m1.nRows; ++i)
+            {
+                double m1v1 = 0.0;
+                for (int j = 0; j < m1.nCols; ++j)
+                    m1v1 += _m1[i, j] * _v1[j];
+                Assert.IsTrue(Math.Abs(m1v1 - _v2[i]) <= 5e-5);
+            }
+        }
+
+        [TestMethod]
+        public void Invert()
+        {
+            ColumnWiseMatrix A = GetInvertibleMatrix(128);
+            DeviceManager.CheckDeviceSanity();
+
+            ColumnWiseMatrix AMinus1 = new ColumnWiseMatrix(A);
+            AMinus1.Invert();
+            DeviceManager.CheckDeviceSanity();
+
+            var eye = A.Multiply(AMinus1);
+            var _eye = eye.GetMatrix<float>();
+            var _A = A.GetMatrix<float>();
+            var _AMinus1 = AMinus1.GetMatrix<float>();
+
+            for (int i = 0; i < A.nRows; ++i)
+            {
+                for (int j = 0; j < A.nCols; ++j)
+                {
+                    double expected = i == j ? 1.0 : 0.0;
+                    Assert.IsTrue(Math.Abs(_eye[i, j] - expected) <= 5e-5);
+                }
+            }
+        }
+
+
+        [TestMethod]
+        public void Solve()
+        {
+            ColumnWiseMatrix A = GetInvertibleMatrix(128);
+            DeviceManager.CheckDeviceSanity();
+            var _A = A.GetMatrix<float>();
+
+            ColumnWiseMatrix B = GetInvertibleMatrix(128, 2345);
+            DeviceManager.CheckDeviceSanity();
+            var _B = B.GetMatrix<float>();
+
+            A.Solve(B);
+            DeviceManager.CheckDeviceSanity();
+            var _x = B.Get<float>();
+
+            var BSanity = A.Multiply(B);
+            var _BSanity = BSanity.GetMatrix<float>();
+
+            for (int i = 0; i < A.nRows; ++i)
+            {
+                for (int j = 0; j < A.nCols; ++j)
+                {
+                    double expected = _B[i, j];
+                    Assert.IsTrue(Math.Abs(_BSanity[i, j] - expected) <= 5e-5);
+                }
+            }
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs.AsArray(), rhs.Count);
+            ReadFrom(rhs.ToArray(), rhs.Count);
         }
 
         public void ReadFrom<T>(T[,] rhs) where T : struct, IEquatable<T>, IFormattable
@@ -99,8 +99,8 @@ namespace CudaLightSharp.Buffers
         {
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
-                         (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs.AsArray(), rhs.RowCount * rhs.ColumnCount);
+                         ( mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
+            ReadFrom(rhs.ToColumnMajorArray(), rhs.RowCount * rhs.ColumnCount);
         }
 
         private void ReadFrom(object rhs, int nElements)

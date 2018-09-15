@@ -21,7 +21,7 @@ namespace CudaLightSharp.Buffers
     {
         public static void Print<T>(this Vector<T> vector, string label = "") where T : struct, IEquatable<T>, IFormattable
         {
-            Print(vector.AsArray(), label);
+            Print(vector.ToArray(), label);
         }
         public static void Print<T>(this T[] vector, string label = "") where T : struct, IEquatable<T>, IFormattable
         {
@@ -58,7 +58,7 @@ namespace CudaLightSharp.Buffers
             ReadFrom(rhs);
         }
         public Vector(Vector<double> rhs)
-            : this(rhs.AsArray())
+            : this(rhs.ToArray())
         {
         }
 
@@ -78,7 +78,7 @@ namespace CudaLightSharp.Buffers
             ReadFrom(rhs);
         }
         public Vector(Vector<int> rhs)
-            : this(rhs.AsArray())
+            : this(rhs.ToArray())
         {
         }
 
