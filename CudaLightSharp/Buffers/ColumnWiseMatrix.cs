@@ -158,6 +158,73 @@ namespace CudaLightSharp.Buffers
 
         #region Linear Algebra
 
+        public static ColumnWiseMatrix operator +(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs)
+        {
+            Debug.Assert(lhs.nRows == rhs.nRows);
+            Debug.Assert(lhs.nCols == rhs.nCols);
+            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
+            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+
+            ColumnWiseMatrix tmp = new ColumnWiseMatrix(lhs);
+            CuBlasApi.AddEqualMatrix(tmp._buffer, rhs._buffer, MatrixOperation.None, MatrixOperation.None, 1.0);
+
+            return tmp;
+        }
+
+        public static ColumnWiseMatrix operator -(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs)
+        {
+            Debug.Assert(lhs.nRows == rhs.nRows);
+            Debug.Assert(lhs.nCols == rhs.nCols);
+            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
+            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+
+            ColumnWiseMatrix tmp = new ColumnWiseMatrix(lhs);
+            CuBlasApi.AddEqualMatrix(tmp._buffer, rhs._buffer, MatrixOperation.None, MatrixOperation.None, -1.0);
+
+            return tmp;
+        }
+
+        public static ColumnWiseMatrix operator %(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs)
+        {
+            Debug.Assert(lhs.nRows == rhs.nRows);
+            Debug.Assert(lhs.nCols == rhs.nCols);
+            Debug.Assert(lhs.memorySpace == rhs.memorySpace);
+            Debug.Assert(lhs.mathDomain == rhs.mathDomain);
+            Debug.Assert(lhs.buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+
+            ColumnWiseMatrix tmp = new ColumnWiseMatrix(lhs);
+            ElementWiseProduct(tmp.buffer, rhs.buffer);
+
+            return tmp;
+        }
+
+        public static ColumnWiseMatrix Add(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None, MatrixOperation rhsOperation = MatrixOperation.None, double alpha = 1.0)
+        {
+            ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs);
+            CuBlasApi.AddEqualMatrix(ret._buffer, rhs._buffer, lhsOperation, rhsOperation, alpha);
+
+            return ret;
+        }
+
+        public static ColumnWiseMatrix Subtract(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None, MatrixOperation rhsOperation = MatrixOperation.None)
+        {
+            ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs);
+            CuBlasApi.AddEqualMatrix(ret._buffer, rhs._buffer, lhsOperation, rhsOperation, -1.0);
+
+            return ret;
+        }
+
+        public static ColumnWiseMatrix ElementWiseProduct(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs)
+        {
+            ColumnWiseMatrix ret = lhs % rhs;
+            return ret;
+        }
+
         public static ColumnWiseMatrix operator *(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs)
         {
             Debug.Assert(rhs.nRows == lhs.nCols);
