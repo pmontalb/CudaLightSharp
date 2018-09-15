@@ -21,7 +21,7 @@ namespace CudaLightSharp.Buffers
     {
         public static void Print<T>(this Matrix<T> matrix, string label = "") where T : struct, IEquatable<T>, IFormattable
         {
-            Print(matrix.AsArray(), matrix.RowCount, matrix.ColumnCount, label);
+            Print(matrix.ToArray(), matrix.RowCount, matrix.ColumnCount, label);
         }
         public static void Print<T>(this T[,] matrix, int nRows, int nCols, string label = "") where T : struct, IEquatable<T>, IFormattable
         {
@@ -52,9 +52,6 @@ namespace CudaLightSharp.Buffers
         public ColumnWiseMatrix(int nRows, int nCols, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : base(true, memorySpace, mathDomain)
         {
-            this.nRows = nRows;
-            this.nCols = nCols;
-
             _buffer = new MemoryTile(0, (uint)nRows, (uint)nCols, memorySpace, mathDomain);
             ctor(_buffer);
 
@@ -86,12 +83,18 @@ namespace CudaLightSharp.Buffers
             ReadFrom(rhs);
         }
 
+        internal ColumnWiseMatrix(MemoryTile buffer)
+            : base(false, buffer.memorySpace, buffer.mathDomain)
+        {
+            _buffer = buffer;
+        }
+
         #region Read from double
 
         public ColumnWiseMatrix(double[] rhs)
             : this(rhs.Length, 1, MemorySpace.Device, MathDomain.Double)
         {
-            ReadFrom(rhs);
+            ReadFrom(rhs, rhs.Length);
         }
 
         public ColumnWiseMatrix(double[,] rhs)
@@ -107,7 +110,7 @@ namespace CudaLightSharp.Buffers
         }
 
         public ColumnWiseMatrix(Vector<double> rhs)
-            : this(rhs.AsArray())
+            : this(rhs.ToArray())
         {
         }
 
@@ -118,7 +121,7 @@ namespace CudaLightSharp.Buffers
         public ColumnWiseMatrix(float[] rhs)
             : this(rhs.Length, 1, MemorySpace.Device, MathDomain.Float)
         {
-            ReadFrom(rhs);
+            ReadFrom(rhs, rhs.Length);
         }
 
         public ColumnWiseMatrix(float[,] rhs)
@@ -134,7 +137,7 @@ namespace CudaLightSharp.Buffers
         }
 
         public ColumnWiseMatrix(Vector<float> rhs)
-            : this(rhs.AsArray())
+            : this(rhs.ToArray())
         {
         }
 
@@ -145,7 +148,7 @@ namespace CudaLightSharp.Buffers
         public ColumnWiseMatrix(int[] rhs)
             : this(rhs.Length, 1, MemorySpace.Device, MathDomain.Int)
         {
-            ReadFrom(rhs);
+            ReadFrom(rhs, rhs.Length);
         }
 
         public ColumnWiseMatrix(int[,] rhs)
@@ -354,26 +357,26 @@ namespace CudaLightSharp.Buffers
 
         public static ColumnWiseMatrix LinSpace(int nRows, int nCols, double x0, double x1, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
         {
-            var vec = new ColumnWiseMatrix(nRows, nCols, memorySpace, mathDomain);
-            vec.LinSpace(x0, x1);
+            var mat = new ColumnWiseMatrix(nRows, nCols, memorySpace, mathDomain);
+            mat.LinSpace(x0, x1);
 
-            return vec;
+            return mat;
         }
 
         public static ColumnWiseMatrix RandomUniform(int nRows, int nCols, int seed, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
         {
-            var vec = new ColumnWiseMatrix(nRows, nCols, memorySpace, mathDomain);
-            vec.RandomUniform(seed);
+            var mat = new ColumnWiseMatrix(nRows, nCols, memorySpace, mathDomain);
+            mat.RandomUniform(seed);
 
-            return vec;
+            return mat;
         }
 
         public static ColumnWiseMatrix RandomGaussian(int nRows, int nCols, int seed, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
         {
-            var vec = new ColumnWiseMatrix(nRows, nCols, memorySpace, mathDomain);
-            vec.RandomGaussian(seed);
+            var mat = new ColumnWiseMatrix(nRows, nCols, memorySpace, mathDomain);
+            mat.RandomGaussian(seed);
 
-            return vec;
+            return mat;
         }
 
         public void Print(string label = "")
@@ -405,8 +408,8 @@ namespace CudaLightSharp.Buffers
             }
         }
 
-        public readonly int nRows;
-        public readonly int nCols;
+        public int nRows => (int)_buffer.nRows;
+        public int nCols => (int)_buffer.nCols;
 
         public Vector Column(int i) { return columns[i]; }
 
@@ -415,7 +418,7 @@ namespace CudaLightSharp.Buffers
             return columns[i].Get<T>();
         }
 
-        MemoryTile _buffer;
+        private readonly MemoryTile _buffer;
         internal override MemoryBuffer buffer => _buffer;
         internal readonly Vector[] columns;
     }

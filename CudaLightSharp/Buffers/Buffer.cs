@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 #if FORCE_32_BIT
     using PtrT = System.UInt32;
@@ -71,12 +72,12 @@ namespace CudaLightSharp.Buffers
             MemoryManagerApi.AutoCopy(buffer, rhs.buffer);
         }
 
-        public void ReadFrom<T>(T[] rhs) where T : struct, IEquatable<T>, IFormattable
+        public void ReadFrom<T>(IEnumerable<T> rhs, int size) where T : struct, IEquatable<T>, IFormattable
         {
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs, rhs.Length);
+            ReadFrom(rhs, size);
         }
 
         public void ReadFrom<T>(Vector<T> rhs) where T : struct, IEquatable<T>, IFormattable
@@ -94,6 +95,15 @@ namespace CudaLightSharp.Buffers
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
             ReadFrom(rhs, rhs.Length);
         }
+
+        public void ReadFrom<T>(T[,,] rhs) where T : struct, IEquatable<T>, IFormattable
+        {
+            Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
+                         (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
+                         (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
+            ReadFrom(rhs, rhs.Length);
+        }
+
 
         public void ReadFrom<T>(Matrix<T> rhs) where T : struct, IEquatable<T>, IFormattable
         {
@@ -207,7 +217,7 @@ namespace CudaLightSharp.Buffers
 
         #region Get underlying data
 
-        public T[] GetRaw<T>() where T : struct, IEquatable<T>, IFormattable
+        public virtual T[] GetRaw<T>() where T : struct, IEquatable<T>, IFormattable
         {
             Debug.Assert(buffer.pointer != 0);
 

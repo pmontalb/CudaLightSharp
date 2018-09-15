@@ -55,7 +55,7 @@ namespace CudaLightSharp.Buffers
         public Vector(double[] rhs)
             : this(rhs.Length, MemorySpace.Device, MathDomain.Double)
         {
-            ReadFrom(rhs);
+            ReadFrom(rhs, rhs.Length);
         }
         public Vector(Vector<double> rhs)
             : this(rhs.ToArray())
@@ -65,7 +65,7 @@ namespace CudaLightSharp.Buffers
         public Vector(float[] rhs)
             : this(rhs.Length, MemorySpace.Device, MathDomain.Float)
         {
-            ReadFrom(rhs);
+            ReadFrom(rhs, rhs.Length);
         }
         public Vector(Vector<float> rhs)
             : this(rhs.AsArray())
@@ -75,7 +75,7 @@ namespace CudaLightSharp.Buffers
         public Vector(int[] rhs)
             : this(rhs.Length, MemorySpace.Device, MathDomain.Int)
         {
-            ReadFrom(rhs);
+            ReadFrom(rhs, rhs.Length);
         }
         public Vector(Vector<int> rhs)
             : this(rhs.ToArray())
@@ -209,7 +209,7 @@ namespace CudaLightSharp.Buffers
             }
         }
 
-        private MemoryBuffer _buffer;
+        private readonly MemoryBuffer _buffer;
         internal override MemoryBuffer buffer => _buffer;
     }
 }

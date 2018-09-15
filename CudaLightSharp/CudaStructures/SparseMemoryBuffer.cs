@@ -19,7 +19,7 @@ namespace CudaLightSharp.CudaStructures
     {
         public PtrT indices;
 
-        SparseMemoryBuffer(PtrT pointer = 0,
+        public SparseMemoryBuffer(PtrT pointer = 0,
                            uint nNonZeros = 0,
                            PtrT indices = 0,
                            MemorySpace memorySpace = MemorySpace.Null,
