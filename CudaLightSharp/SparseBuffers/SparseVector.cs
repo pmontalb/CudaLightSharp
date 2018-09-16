@@ -11,7 +11,7 @@ using CudaLightSharp.Manager.CudaAPI;
 
 namespace CudaLightSharp.SparseBuffers
 {
-    class SparseVector : Buffers.Buffer
+    public class SparseVector : Buffers.Buffer
     {
         public SparseVector(int denseSize, Vector nonZeroIndices, MathDomain mathDomain)
             : base(false, // SparseVector doesn't allocate its memory in its buffer, but it uses the convenience vector this.values
@@ -61,6 +61,7 @@ namespace CudaLightSharp.SparseBuffers
                     break;
             }
 
+            _buffer = new SparseMemoryBuffer(0, (uint)nonZeroIndices.Size, 0, memorySpace, mathDomain);
             SyncPointers();
         }
 
@@ -109,7 +110,7 @@ namespace CudaLightSharp.SparseBuffers
             int[] _indices = nonZeroIndices.GetRaw<int>();
 
             T[] ret = new T[denseSize];
-            for (int i = 0; i < denseSize; i++)
+            for (int i = 0; i < Size; i++)
                 ret[_indices[i]] = _values[i];
 
             return ret;

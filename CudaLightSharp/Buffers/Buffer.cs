@@ -6,6 +6,7 @@ using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Linq;
 
 #if FORCE_32_BIT
     using PtrT = System.UInt32;
@@ -77,7 +78,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs, size);
+            ReadFromImpl(rhs.ToArray(), size);
         }
 
         public void ReadFrom<T>(Vector<T> rhs) where T : struct, IEquatable<T>, IFormattable
@@ -85,7 +86,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs.ToArray(), rhs.Count);
+            ReadFromImpl(rhs.ToArray(), rhs.Count);
         }
 
         public void ReadFrom<T>(T[,] rhs) where T : struct, IEquatable<T>, IFormattable
@@ -93,7 +94,7 @@ namespace CudaLightSharp.Buffers
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs, rhs.Length);
+            ReadFromImpl(rhs, rhs.Length);
         }
 
         public void ReadFrom<T>(T[,,] rhs) where T : struct, IEquatable<T>, IFormattable
@@ -101,19 +102,18 @@ namespace CudaLightSharp.Buffers
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs, rhs.Length);
+            ReadFromImpl(rhs, rhs.Length);
         }
-
 
         public void ReadFrom<T>(Matrix<T> rhs) where T : struct, IEquatable<T>, IFormattable
         {
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          ( mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFrom(rhs.ToColumnMajorArray(), rhs.RowCount * rhs.ColumnCount);
+            ReadFromImpl(rhs.ToColumnMajorArray(), rhs.RowCount * rhs.ColumnCount);
         }
 
-        private void ReadFrom(object rhs, int nElements)
+        private void ReadFromImpl(object rhs, int nElements)
         {
             MemoryBuffer rhsBuf;
             switch (mathDomain)
