@@ -81,10 +81,10 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _MultiplyRaw(PtrT A, PtrT B, PtrT C, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain, uint leadingDimensionB, uint leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha);
+        private static extern unsafe int _MultiplyRaw(PtrT A, PtrT B, PtrT C, uint nRowsB, uint nRowsC, uint nColsC, MemorySpace memorySpace, MathDomain mathDomain, uint leadingDimensionB, uint leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha);
         public static void Multiply(MemoryTile A, MemoryTile B, MemoryTile C, int leadingDimensionB, int leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha)
         {
-            int err = _MultiplyRaw(A.pointer, B.pointer, C.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain, (uint)leadingDimensionB, (uint)leadingDimensionC, bOperation, cOperation, alpha);
+            int err = _MultiplyRaw(A.pointer, B.pointer, C.pointer, B.nRows, C.nRows, C.nCols, A.memorySpace, A.mathDomain, (uint)leadingDimensionB, (uint)leadingDimensionC, bOperation, cOperation, alpha);
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_MultiplyRaw", err);
         }

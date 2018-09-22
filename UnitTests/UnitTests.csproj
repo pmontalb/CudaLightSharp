@@ -55,6 +55,7 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CuSparseTests.cs" />
     <Compile Include="DeviceManagerTests.cs" />
     <Compile Include="MatrixTests.cs" />
     <Compile Include="CuBlasTests.cs" />

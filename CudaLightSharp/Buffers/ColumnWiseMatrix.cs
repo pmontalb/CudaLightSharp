@@ -242,20 +242,6 @@ namespace CudaLightSharp.Buffers
             return ret;
         }
 
-        public ColumnWiseMatrix Multiply(ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None, MatrixOperation rhsOperation = MatrixOperation.None, double alpha = 1.0)
-        {
-            Debug.Assert(rhs.nRows == nCols);
-            Debug.Assert(memorySpace == rhs.memorySpace);
-            Debug.Assert(mathDomain == rhs.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-
-            ColumnWiseMatrix ret = new ColumnWiseMatrix(nRows, rhs.nCols, memorySpace, rhs.mathDomain);
-            CuBlasApi.Multiply(ret._buffer, _buffer, rhs._buffer, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
-
-            return ret;
-        }
-
         public static Vector operator *(ColumnWiseMatrix lhs, Vector rhs)
         {
             Debug.Assert(rhs.Size == lhs.nCols);
@@ -270,20 +256,72 @@ namespace CudaLightSharp.Buffers
             return ret;
         }
 
-        public Vector Dot(Vector rhs, MatrixOperation lhsOperation, double alpha)
+        public ColumnWiseMatrix Multiply(ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None, MatrixOperation rhsOperation = MatrixOperation.None, double alpha = 1.0)
         {
-            Debug.Assert(rhs.Size == nCols);
-            Debug.Assert(memorySpace == rhs.memorySpace);
-            Debug.Assert(mathDomain == rhs.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-
-            Vector ret = new Vector(rhs.Size, memorySpace, rhs.mathDomain);
-            CuBlasApi.Dot(ret.buffer, _buffer, rhs.buffer, lhsOperation, alpha);
+            ColumnWiseMatrix ret = new ColumnWiseMatrix(nRows, rhs.nCols, memorySpace, rhs.mathDomain);
+            Multiply(ret, rhs, lhsOperation, rhsOperation, alpha);
 
             return ret;
         }
 
+        /// <summary>
+        /// Same version as above, but gives the possibility of reusing the output buffer
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="rhs"></param>
+        /// <param name="lhsOperation"></param>
+        /// <param name="rhsOperation"></param>
+        /// <param name="alpha"></param>
+        public void Multiply(ColumnWiseMatrix output, ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None, MatrixOperation rhsOperation = MatrixOperation.None, double alpha = 1.0)
+        {
+            Debug.Assert(rhs.nRows == nCols);
+            Debug.Assert(output.nRows == nRows);
+            Debug.Assert(output.nCols == rhs.nCols);
+            Debug.Assert(memorySpace == rhs.memorySpace);
+            Debug.Assert(memorySpace == output.memorySpace);
+            Debug.Assert(mathDomain == rhs.mathDomain);
+            Debug.Assert(mathDomain == output.mathDomain);
+            Debug.Assert(buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(output.buffer.pointer != 0);
+
+            CuBlasApi.Multiply(output._buffer, _buffer, rhs._buffer, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
+        }
+
+        public Vector Dot(Vector rhs, MatrixOperation lhsOperation, double alpha)
+        {
+            Vector ret = new Vector(rhs.Size, memorySpace, rhs.mathDomain);
+            Dot(ret, rhs, lhsOperation, alpha);
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Same version as above, but gives the possibility of reusing the output buffer
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="rhs"></param>
+        /// <param name="lhsOperation"></param>
+        /// <param name="alpha"></param>
+        public void Dot(Vector output, Vector rhs, MatrixOperation lhsOperation = MatrixOperation.None, double alpha = 1.0)
+        {
+            Debug.Assert(rhs.Size == nCols);
+            Debug.Assert(output.Size == rhs.Size);
+            Debug.Assert(memorySpace == rhs.memorySpace);
+            Debug.Assert(memorySpace == output.memorySpace);
+            Debug.Assert(mathDomain == rhs.mathDomain);
+            Debug.Assert(mathDomain == output.mathDomain);
+            Debug.Assert(buffer.pointer != 0);
+            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(output.buffer.pointer != 0);
+
+            CuBlasApi.Dot(output.buffer, _buffer, rhs.buffer, lhsOperation, alpha);
+        }
+
+        /// <summary>
+        /// Invert inplace - WARNING, use Solve for higher performance
+        /// </summary>
+        /// <param name="operation"></param>
         public void Invert(MatrixOperation operation = MatrixOperation.None)
         {
             Debug.Assert(nRows == nCols);
@@ -292,6 +330,11 @@ namespace CudaLightSharp.Buffers
             CuBlasApi.Invert(_buffer, operation);            
         }
 
+        /// <summary>
+        /// Solve A * X = B, B is overwritten
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <param name="lhsOperation"></param>
         public void Solve(ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None)
         {
             Debug.Assert(nRows == nCols);

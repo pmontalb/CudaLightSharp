@@ -43,6 +43,7 @@ namespace CudaLightSharp.SparseBuffers
         /// Copy denseVector to host, numerically finds the non-zero indices, and then copy back to device
         /// </summary>
         public SparseVector(Vector denseVector)
+            : base(false, denseVector.memorySpace, denseVector.mathDomain)
         {
             this.denseSize = denseVector.Size;
 
@@ -90,7 +91,7 @@ namespace CudaLightSharp.SparseBuffers
         public SparseVector(SparseVector rhs)
             : this(rhs.denseSize, rhs.nonZeroIndices, rhs.mathDomain)
         {
-            this.values = rhs.values;
+            this.values = new Vector(rhs.values);
             SyncPointers();
         }
 
@@ -110,7 +111,7 @@ namespace CudaLightSharp.SparseBuffers
             int[] _indices = nonZeroIndices.GetRaw<int>();
 
             T[] ret = new T[denseSize];
-            for (int i = 0; i < Size; i++)
+            for (int i = 0; i < _indices.Length; i++)
                 ret[_indices[i]] = _values[i];
 
             return ret;
@@ -149,7 +150,7 @@ namespace CudaLightSharp.SparseBuffers
 
         public static Vector operator +(Vector lhs, SparseVector rhs)
         {
-            Debug.Assert(lhs.Size == rhs.Size);
+            Debug.Assert(lhs.Size == rhs.denseSize);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
             Debug.Assert(lhs.buffer.pointer != 0);
@@ -161,9 +162,14 @@ namespace CudaLightSharp.SparseBuffers
             return ret;
         }
 
+        public static Vector operator +(SparseVector lhs, Vector rhs)
+        {
+            return rhs + lhs;
+        }
+
         public static Vector operator -(Vector lhs, SparseVector rhs)
         {
-            Debug.Assert(lhs.Size == rhs.Size);
+            Debug.Assert(lhs.Size == rhs.denseSize);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
             Debug.Assert(lhs.buffer.pointer != 0);
@@ -177,7 +183,7 @@ namespace CudaLightSharp.SparseBuffers
 
         public Vector Add(Vector rhs, double alpha = 1.0)
         {
-            Debug.Assert(Size == rhs.Size);
+            Debug.Assert(denseSize == rhs.Size);
             Debug.Assert(memorySpace == rhs.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
             Debug.Assert(buffer.pointer != 0);

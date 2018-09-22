@@ -74,6 +74,7 @@
     <Compile Include="Manager\CudaAPI\MemoryManagerApi.cs" />
     <Compile Include="Manager\DeviceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SparseBuffers\CompressedSparseRowMatrix.cs" />
     <Compile Include="SparseBuffers\SparseVector.cs" />
   </ItemGroup>
   <ItemGroup>
