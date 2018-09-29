@@ -1,19 +1,8 @@
 ﻿using CudaLightSharp.CudaEnumerators;
 using CudaLightSharp.CudaStructures;
-using CudaLightSharp.Manager.CudaAPI;
 using MathNet.Numerics.LinearAlgebra;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if FORCE_32_BIT
-    using PtrT = System.UInt32;
-#else
-    using PtrT = System.UInt64;
-#endif
 
 namespace CudaLightSharp.Buffers
 {
@@ -31,7 +20,7 @@ namespace CudaLightSharp.Buffers
         }
     }
 
-    public unsafe class Vector: Buffer
+    public unsafe class Vector : ContiguousMemoryBuffer
     {
         public Vector(int size, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : base(true, memorySpace, mathDomain)
@@ -82,6 +71,34 @@ namespace CudaLightSharp.Buffers
         {
         }
 
+        public Vector(string fileName, MathDomain mathDomain)
+        {
+            _buffer = new MemoryBuffer(0, 0, memorySpace, mathDomain);
+
+            switch (mathDomain)
+            {
+                case MathDomain.Null:
+                    throw new ArgumentNullException();
+                case MathDomain.Int:
+                    {
+                        ReadFrom<int>(fileName);
+                        break;
+                    }
+                case MathDomain.Float:
+                    {
+                        ReadFrom<float>(fileName);
+                        break;
+                    }
+                case MathDomain.Double:
+                    {
+                        ReadFrom<double>(fileName);
+                        break;
+                    }
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         internal Vector(MemoryBuffer buffer)
             : base(false, buffer.memorySpace, buffer.mathDomain)
         {
@@ -95,11 +112,11 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector tmp = new Vector(lhs);
-            Add(tmp.buffer, rhs.buffer);
+            Add(tmp.Buffer, rhs.Buffer);
 
             return tmp;
         }
@@ -109,11 +126,11 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector tmp = new Vector(lhs);
-            Subtract(tmp.buffer, rhs.buffer);
+            Subtract(tmp.Buffer, rhs.Buffer);
 
             return tmp;
         }
@@ -123,11 +140,11 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector tmp = new Vector(lhs);
-            ElementWiseProduct(tmp.buffer, rhs.buffer);
+            ElementWiseProduct(tmp.Buffer, rhs.Buffer);
 
             return tmp;
         }
@@ -180,7 +197,7 @@ namespace CudaLightSharp.Buffers
             return vec;
         }
 
-        public void Print(string label = "") 
+        public void Print(string label = "")
         {
             switch (mathDomain)
             {
@@ -210,6 +227,6 @@ namespace CudaLightSharp.Buffers
         }
 
         private readonly MemoryBuffer _buffer;
-        internal override MemoryBuffer buffer => _buffer;
+        internal override MemoryBuffer Buffer => _buffer;
     }
 }

@@ -7,6 +7,9 @@ using MathNet.Numerics.LinearAlgebra;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Linq;
+using ZeroFormatter;
+using ZeroFormatter.Formatters;
+using System.IO;
 
 #if FORCE_32_BIT
     using PtrT = System.UInt32;
@@ -16,9 +19,10 @@ using PtrT = System.UInt64;
 
 namespace CudaLightSharp.Buffers
 {
-    public unsafe abstract class Buffer : IDisposable
+    [Serializable]
+    public unsafe abstract class ContiguousMemoryBuffer : IDisposable
     {
-        internal Buffer(bool isOwner = true, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
+        internal ContiguousMemoryBuffer(bool isOwner = true, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
         {
             this.isOwner = isOwner;
             this.memorySpace = memorySpace;
@@ -59,18 +63,18 @@ namespace CudaLightSharp.Buffers
 
         internal void Alloc<T>(int bufferSize, T value) where T : struct, IEquatable<T>, IFormattable
         {
-            Alloc(buffer);
+            Alloc(Buffer);
 
             Set(value);
         }
 
         #region ReadFrom
 
-        internal void ReadFrom(Buffer rhs)
+        internal void ReadFrom(ContiguousMemoryBuffer rhs)
         {
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-            MemoryManagerApi.AutoCopy(buffer, rhs.buffer);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
+            MemoryManagerApi.AutoCopy(Buffer, rhs.Buffer);
         }
 
         public void ReadFrom<T>(IEnumerable<T> rhs, int size) where T : struct, IEquatable<T>, IFormattable
@@ -115,6 +119,16 @@ namespace CudaLightSharp.Buffers
 
         private void ReadFromImpl(object rhs, int nElements)
         {
+            if (nElements != Buffer.size)
+            {
+                // need to reallocate device memory
+                if (Buffer.pointer != 0)
+                    Free();
+
+                Buffer.size = (uint)nElements;
+                Alloc(Buffer);
+            }
+
             MemoryBuffer rhsBuf;
             switch (mathDomain)
             {
@@ -145,7 +159,7 @@ namespace CudaLightSharp.Buffers
                     throw new NotImplementedException();
             }
 
-            MemoryManagerApi.AutoCopy(buffer, rhsBuf);
+            MemoryManagerApi.AutoCopy(Buffer, rhsBuf);
         }
 
         #endregion
@@ -154,33 +168,33 @@ namespace CudaLightSharp.Buffers
 
         public void Set<T>(T value) where T : struct, IEquatable<T>, IFormattable
         {
-            Debug.Assert(buffer.pointer != 0);
-            BufferInitializerApi.Initialize(buffer, Convert.ToDouble(value));
+            Debug.Assert(Buffer.pointer != 0);
+            BufferInitializerApi.Initialize(Buffer, Convert.ToDouble(value));
         }
 
         public void LinSpace<T>(T x0, T x1) where T : struct, IEquatable<T>, IFormattable
         {
-            Debug.Assert(buffer.pointer != 0);
-            BufferInitializerApi.LinSpace(buffer, Convert.ToDouble(x0), Convert.ToDouble(x1));
+            Debug.Assert(Buffer.pointer != 0);
+            BufferInitializerApi.LinSpace(Buffer, Convert.ToDouble(x0), Convert.ToDouble(x1));
         }
 
         public void RandomUniform(int seed = 1234)
         {
-            Debug.Assert(buffer.pointer != 0);
-            BufferInitializerApi.RandUniform(buffer, seed);
+            Debug.Assert(Buffer.pointer != 0);
+            BufferInitializerApi.RandUniform(Buffer, seed);
         }
 
         public void RandomGaussian(int seed = 1234)
         {
-            Debug.Assert(buffer.pointer != 0);
-            BufferInitializerApi.RandNormal(buffer, seed);
+            Debug.Assert(Buffer.pointer != 0);
+            BufferInitializerApi.RandNormal(Buffer, seed);
         }
 
         #endregion
 
         #region Dispose
 
-        ~Buffer()
+        ~ContiguousMemoryBuffer()
         {
             if (!disposed)
                 Console.WriteLine(String.Format("Not-disposed warning: {0}", GetType()));
@@ -193,24 +207,46 @@ namespace CudaLightSharp.Buffers
             if (disposed)
                 return;
 
-            Debug.WriteLine(String.Format("{0:G}, {1}: {2}[{3}]", DateTime.Now, "Disposing", GetType(), buffer.pointer));
+            Debug.WriteLine(String.Format("{0:G}, {1}: {2}[{3}]", DateTime.Now, "Disposing", GetType(), Buffer.pointer));
+            Free();
 
-            Debug.Assert(buffer.pointer != 0);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Free()
+        {
+            Debug.Assert(Buffer.pointer != 0);
             switch (memorySpace)
             {
                 case MemorySpace.Null:
                     throw new ArgumentNullException();
                 case MemorySpace.Host:
-                    MemoryManagerApi.FreeHost(buffer);
+                    MemoryManagerApi.FreeHost(Buffer);
                     break;
                 case MemorySpace.Device:
-                    MemoryManagerApi.Free(buffer);
+                    MemoryManagerApi.Free(Buffer);
                     break;
                 default:
                     throw new NotImplementedException();
             }
+        }
 
-            GC.SuppressFinalize(this);
+        #endregion
+
+        #region Serialization
+
+        public virtual void ReadFrom<T>(string filePath) where T : struct, IEquatable<T>, IFormattable
+        {
+            byte[] bytes = File.ReadAllBytes(filePath);
+            T[] data = ZeroFormatterSerializer.Deserialize<T[]>(bytes);
+            ReadFrom(data, data.Length);
+        }
+
+        public virtual void ToBinaryFile<T>(string filePath) where T : struct, IEquatable<T>, IFormattable
+        {
+            var data = GetRaw<T>();
+            byte[] bytes = ZeroFormatterSerializer.Serialize(data);
+            File.WriteAllBytes(filePath, bytes);
         }
 
         #endregion
@@ -219,12 +255,12 @@ namespace CudaLightSharp.Buffers
 
         public virtual T[] GetRaw<T>() where T : struct, IEquatable<T>, IFormattable
         {
-            Debug.Assert(buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
 
             // prepare a buffer host-side
-            MemoryBuffer hostBuffer = new MemoryBuffer(0, (uint)buffer.size, MemorySpace.Host, mathDomain);
+            MemoryBuffer hostBuffer = new MemoryBuffer(0, (uint)Buffer.size, MemorySpace.Host, mathDomain);
             MemoryManagerApi.AllocHost(hostBuffer);
-            MemoryManagerApi.AutoCopy(hostBuffer, buffer);
+            MemoryManagerApi.AutoCopy(hostBuffer, Buffer);
 
             object ret = null;
 
@@ -266,14 +302,14 @@ namespace CudaLightSharp.Buffers
             if (obj == null)
                 return false;
 
-            Buffer buf = obj as Buffer;
+            ContiguousMemoryBuffer buf = obj as ContiguousMemoryBuffer;
             if (buf == null)
                 return false;
 
             return Equals(buf);
         }
 
-        public bool Equals(Buffer rhs)
+        public bool Equals(ContiguousMemoryBuffer rhs)
         {
             if (mathDomain != rhs.mathDomain)
                 return false;
@@ -316,7 +352,7 @@ namespace CudaLightSharp.Buffers
             }
         }
 
-        public static bool operator ==(Buffer lhs, Buffer rhs)
+        public static bool operator ==(ContiguousMemoryBuffer lhs, ContiguousMemoryBuffer rhs)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(lhs, rhs))
@@ -329,7 +365,7 @@ namespace CudaLightSharp.Buffers
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Buffer lhs, Buffer rhs)
+        public static bool operator !=(ContiguousMemoryBuffer lhs, ContiguousMemoryBuffer rhs)
         {
             return !(lhs == rhs);
         }
@@ -349,15 +385,15 @@ namespace CudaLightSharp.Buffers
             return lhs;
         }
 
-        public void AddEqual(Buffer rhs, double alpha = 1.0)
+        public void AddEqual(ContiguousMemoryBuffer rhs, double alpha = 1.0)
         {
             Debug.Assert(Size == rhs.Size);
             Debug.Assert(memorySpace == rhs.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
-            CuBlasApi.AddEqual(buffer, rhs.buffer, alpha);
+            CuBlasApi.AddEqual(Buffer, rhs.Buffer, alpha);
         }
 
         internal static MemoryBuffer Subtract(MemoryBuffer lhs, MemoryBuffer rhs)
@@ -366,15 +402,15 @@ namespace CudaLightSharp.Buffers
             return lhs;
         }
 
-        public void SubtractEqual(Buffer rhs)
+        public void SubtractEqual(ContiguousMemoryBuffer rhs)
         {
             Debug.Assert(Size == rhs.Size);
             Debug.Assert(memorySpace == rhs.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
-            CuBlasApi.SubtractEqual(buffer, rhs.buffer);
+            CuBlasApi.SubtractEqual(Buffer, rhs.Buffer);
         }
 
         internal static MemoryBuffer ElementWiseProduct(MemoryBuffer lhs, MemoryBuffer rhs)
@@ -390,18 +426,18 @@ namespace CudaLightSharp.Buffers
 
         public void Scale(double alpha)
         {
-            Debug.Assert(buffer.pointer != 0);
-            CuBlasApi.Scale(buffer, alpha);
+            Debug.Assert(Buffer.pointer != 0);
+            CuBlasApi.Scale(Buffer, alpha);
         }
 
         #endregion
 
-        public int Size => (int)buffer.size;
+        public int Size => (int)Buffer.size;
 
         public readonly MemorySpace memorySpace;
         public readonly MathDomain mathDomain;
 
-        abstract internal MemoryBuffer buffer { get; }
+        abstract internal MemoryBuffer Buffer { get; }
         protected readonly bool isOwner;
 
         private bool disposed = false;

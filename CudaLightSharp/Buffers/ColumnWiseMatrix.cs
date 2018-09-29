@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
 using CudaLightSharp.CudaEnumerators;
 using CudaLightSharp.CudaStructures;
 using CudaLightSharp.Manager.CudaAPI;
+using System.IO;
+using ZeroFormatter;
+using System.Collections.Generic;
 
 #if FORCE_32_BIT
     using PtrT = System.UInt32;
 #else
-    using PtrT = System.UInt64;
+using PtrT = System.UInt64;
 #endif
 
 namespace CudaLightSharp.Buffers
@@ -47,7 +46,7 @@ namespace CudaLightSharp.Buffers
         }
     }
 
-    public unsafe class ColumnWiseMatrix : Buffer
+    public unsafe class ColumnWiseMatrix : ContiguousMemoryBuffer
     {
         public ColumnWiseMatrix(int nRows, int nCols, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : base(true, memorySpace, mathDomain)
@@ -56,13 +55,7 @@ namespace CudaLightSharp.Buffers
             ctor(_buffer);
 
             columns = new Vector[nCols];
-            uint shift = _buffer.ElementarySize();
-
-            for (int i = 0; i < nCols; i++)
-            {
-                MemoryBuffer columnBuffer = new MemoryBuffer(_buffer.pointer + (PtrT)(i * nRows * shift), (uint)nRows, memorySpace, mathDomain);
-                columns[i] = new Vector(columnBuffer);
-            }
+            SetColumnsPointers();
         }
 
         public ColumnWiseMatrix(int nRows, int nCols, double value, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
@@ -159,6 +152,48 @@ namespace CudaLightSharp.Buffers
 
         #endregion
 
+        public ColumnWiseMatrix(string fileName, MathDomain mathDomain)
+        {
+            _buffer = new MemoryTile(0, 0, 0, memorySpace, mathDomain);
+
+            switch (mathDomain)
+            {
+                case MathDomain.Null:
+                    throw new ArgumentNullException();
+                case MathDomain.Int:
+                    {
+                        ReadFrom<int>(fileName);
+                        break;
+                    }
+                case MathDomain.Float:
+                    {
+                        ReadFrom<float>(fileName);
+                        break;
+                    }
+                case MathDomain.Double:
+                    {
+                        ReadFrom<double>(fileName);
+                        break;
+                    }
+                default:
+                    throw new NotImplementedException();
+            }
+
+            columns = new Vector[nCols];
+            SetColumnsPointers();
+        }
+
+        private void SetColumnsPointers()
+        {
+            uint shift = _buffer.ElementarySize();
+
+            for (int i = 0; i < nCols; i++)
+            {
+                MemoryBuffer columnBuffer = new MemoryBuffer(_buffer.pointer + (PtrT)(i * nRows * shift), (uint)nRows, memorySpace, mathDomain);
+                columns[i] = new Vector(columnBuffer);
+            }
+        }
+
         #region Linear Algebra
 
         public static ColumnWiseMatrix operator +(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs)
@@ -167,8 +202,8 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.nCols == rhs.nCols);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             ColumnWiseMatrix tmp = new ColumnWiseMatrix(lhs);
             CuBlasApi.AddEqualMatrix(tmp._buffer, rhs._buffer, MatrixOperation.None, MatrixOperation.None, 1.0);
@@ -182,8 +217,8 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.nCols == rhs.nCols);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             ColumnWiseMatrix tmp = new ColumnWiseMatrix(lhs);
             CuBlasApi.AddEqualMatrix(tmp._buffer, rhs._buffer, MatrixOperation.None, MatrixOperation.None, -1.0);
@@ -197,11 +232,11 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(lhs.nCols == rhs.nCols);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             ColumnWiseMatrix tmp = new ColumnWiseMatrix(lhs);
-            ElementWiseProduct(tmp.buffer, rhs.buffer);
+            ElementWiseProduct(tmp.Buffer, rhs.Buffer);
 
             return tmp;
         }
@@ -233,8 +268,8 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(rhs.nRows == lhs.nCols);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs.nRows, rhs.nCols, lhs.memorySpace, rhs.mathDomain);
             CuBlasApi.Multiply(ret._buffer, lhs._buffer, rhs._buffer, lhs.nRows, rhs.nRows, MatrixOperation.None, MatrixOperation.None, 1.0);
@@ -247,11 +282,11 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(rhs.Size == lhs.nCols);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector ret = new Vector(rhs.Size, lhs.memorySpace, rhs.mathDomain);
-            CuBlasApi.Dot(ret.buffer, lhs._buffer, rhs.buffer, MatrixOperation.None, 1.0);
+            CuBlasApi.Dot(ret.Buffer, lhs._buffer, rhs.Buffer, MatrixOperation.None, 1.0);
 
             return ret;
         }
@@ -281,9 +316,9 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(memorySpace == output.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
             Debug.Assert(mathDomain == output.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-            Debug.Assert(output.buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
+            Debug.Assert(output.Buffer.pointer != 0);
 
             CuBlasApi.Multiply(output._buffer, _buffer, rhs._buffer, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
         }
@@ -311,11 +346,11 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(memorySpace == output.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
             Debug.Assert(mathDomain == output.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-            Debug.Assert(output.buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
+            Debug.Assert(output.Buffer.pointer != 0);
 
-            CuBlasApi.Dot(output.buffer, _buffer, rhs.buffer, lhsOperation, alpha);
+            CuBlasApi.Dot(output.Buffer, _buffer, rhs.Buffer, lhsOperation, alpha);
         }
 
         /// <summary>
@@ -325,7 +360,7 @@ namespace CudaLightSharp.Buffers
         public void Invert(MatrixOperation operation = MatrixOperation.None)
         {
             Debug.Assert(nRows == nCols);
-            Debug.Assert(buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
             
             CuBlasApi.Invert(_buffer, operation);            
         }
@@ -338,7 +373,7 @@ namespace CudaLightSharp.Buffers
         public void Solve(ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None)
         {
             Debug.Assert(nRows == nCols);
-            Debug.Assert(buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
 
             CuBlasApi.Solve(_buffer, rhs._buffer, lhsOperation);
         }
@@ -354,6 +389,36 @@ namespace CudaLightSharp.Buffers
             I.MakeIdentity();
 
             return I;
+        }
+
+        #endregion
+
+        #region Serialization
+
+        public override void ReadFrom<T>(string filePath)
+        {
+            byte[] bytes = File.ReadAllBytes(filePath);
+            T[] dataWithSizeInfo = ZeroFormatterSerializer.Deserialize<T[]>(bytes);
+
+            _buffer.nRows = (uint)Convert.ChangeType(dataWithSizeInfo[dataWithSizeInfo.Length - 2], typeof(uint));
+            _buffer.nCols = (uint)Convert.ChangeType(dataWithSizeInfo[dataWithSizeInfo.Length - 1], typeof(uint));
+
+            T[] data = new T[dataWithSizeInfo.Length - 2];
+            Array.Copy(dataWithSizeInfo, data, data.Length);
+            
+            ReadFrom(data, data.Length);
+        }
+
+        public override void ToBinaryFile<T>(string filePath)
+        {
+            var data = new List<T>(GetRaw<T>())
+            {
+                (T)Convert.ChangeType(nRows, typeof(T)),
+                (T)Convert.ChangeType(nCols, typeof(T))
+            };
+
+            byte[] bytes = ZeroFormatterSerializer.Serialize(data);
+            File.WriteAllBytes(filePath, bytes);
         }
 
         #endregion
@@ -462,7 +527,7 @@ namespace CudaLightSharp.Buffers
         }
 
         private readonly MemoryTile _buffer;
-        internal override MemoryBuffer buffer => _buffer;
+        internal override MemoryBuffer Buffer => _buffer;
         internal readonly Vector[] columns;
     }
 }

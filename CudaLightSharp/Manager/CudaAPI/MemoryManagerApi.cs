@@ -1,16 +1,11 @@
 ﻿using CudaLightSharp.CudaEnumerators;
 using CudaLightSharp.CudaStructures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 #if FORCE_32_BIT
     using PtrT = System.UInt32;
 #else
-using PtrT = System.UInt64;
+    using PtrT = System.UInt64;
 #endif
 
 namespace CudaLightSharp.Manager.CudaAPI

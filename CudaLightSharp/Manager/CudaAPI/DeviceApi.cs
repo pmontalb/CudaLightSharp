@@ -1,11 +1,5 @@
-﻿using CudaLightSharp.CudaEnumerators;
-using CudaLightSharp.CudaStructures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CudaLightSharp.CudaStructures;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CudaLightSharp.Manager.CudaAPI
 {

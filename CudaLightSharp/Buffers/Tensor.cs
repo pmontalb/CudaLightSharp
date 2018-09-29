@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
 using CudaLightSharp.CudaEnumerators;
 using CudaLightSharp.CudaStructures;
-using CudaLightSharp.Manager.CudaAPI;
 
 #if FORCE_32_BIT
     using PtrT = System.UInt32;
@@ -49,7 +44,7 @@ namespace CudaLightSharp.Buffers
         }
     }
 
-    public unsafe class Tensor : Buffer
+    public unsafe class Tensor : ContiguousMemoryBuffer
     {
         public Tensor(int nRows, int nCols, int nCubes, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
             : base(true, memorySpace, mathDomain)
@@ -58,13 +53,7 @@ namespace CudaLightSharp.Buffers
             ctor(_buffer);
 
             cubes = new ColumnWiseMatrix[nCubes];
-            uint shift = _buffer.ElementarySize();
-
-            for (int i = 0; i < nCubes; i++)
-            {
-                MemoryTile columnBuffer = new MemoryTile(_buffer.pointer + (PtrT)(i * nRows * nCols * shift), (uint)nRows, (uint)nCols, memorySpace, mathDomain);
-                cubes[i] = new ColumnWiseMatrix(columnBuffer);
-            }
+            SetCubesPointers();
         }
 
         public Tensor(int nRows, int nCols, int nCubes, double value, MemorySpace memorySpace = MemorySpace.Device, MathDomain mathDomain = MathDomain.Float)
@@ -202,6 +191,17 @@ namespace CudaLightSharp.Buffers
 
         #endregion
 
+        private void SetCubesPointers()
+        {
+            uint shift = _buffer.ElementarySize();
+
+            for (int i = 0; i < nCubes; i++)
+            {
+                MemoryTile columnBuffer = new MemoryTile(_buffer.pointer + (PtrT)(i * nRows * nCols * shift), (uint)nRows, (uint)nCols, memorySpace, mathDomain);
+                cubes[i] = new ColumnWiseMatrix(columnBuffer);
+            }
+        }
+
         public void Set(ColumnWiseMatrix matrix, int row)
         {
             cubes[row].ReadFrom(matrix);
@@ -313,7 +313,7 @@ namespace CudaLightSharp.Buffers
         }
 
         MemoryCube _buffer;
-        internal override MemoryBuffer buffer => _buffer;
+        internal override MemoryBuffer Buffer => _buffer;
         internal readonly ColumnWiseMatrix[] cubes;
     }
 }

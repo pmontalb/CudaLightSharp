@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CudaLightSharp.Buffers;
-using CudaLightSharp.CudaStructures;
+﻿using CudaLightSharp.Buffers;
 using CudaLightSharp.CudaEnumerators;
-using System.Diagnostics;
+using CudaLightSharp.CudaStructures;
 using CudaLightSharp.Manager.CudaAPI;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CudaLightSharp.SparseBuffers
 {
-    public class SparseVector : Buffers.Buffer
+    public class SparseVector : Buffers.ContiguousMemoryBuffer
     {
         public SparseVector(int denseSize, Vector nonZeroIndices, MathDomain mathDomain)
             : base(false, // SparseVector doesn't allocate its memory in its buffer, but it uses the convenience vector this.values
@@ -101,8 +98,8 @@ namespace CudaLightSharp.SparseBuffers
         /// </summary>
         private void SyncPointers()
         {
-            _buffer.pointer = values.buffer.pointer;
-            _buffer.indices = nonZeroIndices.buffer.pointer;
+            _buffer.pointer = values.Buffer.pointer;
+            _buffer.indices = nonZeroIndices.Buffer.pointer;
         }
 
         public override T[] GetRaw<T>()
@@ -153,11 +150,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(lhs.Size == rhs.denseSize);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector ret = new Vector(lhs.Size);
-            CuSparseApi.SparseAdd(ret.buffer, rhs._buffer, lhs.buffer, 1.0);
+            CuSparseApi.SparseAdd(ret.Buffer, rhs._buffer, lhs.Buffer, 1.0);
 
             return ret;
         }
@@ -172,11 +169,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(lhs.Size == rhs.denseSize);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector ret = new Vector(lhs.Size);
-            CuSparseApi.SparseAdd(ret.buffer, rhs._buffer, lhs.buffer, -1.0);
+            CuSparseApi.SparseAdd(ret.Buffer, rhs._buffer, lhs.Buffer, -1.0);
 
             return ret;
         }
@@ -186,11 +183,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(denseSize == rhs.Size);
             Debug.Assert(memorySpace == rhs.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector ret = new Vector(rhs.Size);
-            CuSparseApi.SparseAdd(ret.buffer, _buffer, rhs.buffer, alpha);
+            CuSparseApi.SparseAdd(ret.Buffer, _buffer, rhs.Buffer, alpha);
 
             return ret;
         }
@@ -209,11 +206,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             SparseVector ret = new SparseVector(lhs);
-            CuBlasApi.AddEqual(ret.buffer, rhs.buffer, 1.0);
+            CuBlasApi.AddEqual(ret.Buffer, rhs.Buffer, 1.0);
 
             return ret;
         }
@@ -223,11 +220,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             SparseVector ret = new SparseVector(lhs);
-            CuBlasApi.AddEqual(ret.buffer, rhs.buffer, -1.0);
+            CuBlasApi.AddEqual(ret.Buffer, rhs.Buffer, -1.0);
 
             return ret;
         }
@@ -237,11 +234,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(lhs.Size == rhs.Size);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             SparseVector ret = new SparseVector(lhs);
-            ElementWiseProduct(ret.buffer, rhs.buffer);
+            ElementWiseProduct(ret.Buffer, rhs.Buffer);
 
             return ret;
         }
@@ -256,6 +253,6 @@ namespace CudaLightSharp.SparseBuffers
         
 
         private readonly SparseMemoryBuffer _buffer;
-        internal override MemoryBuffer buffer => _buffer;
+        internal override MemoryBuffer Buffer => _buffer;
     }
 }

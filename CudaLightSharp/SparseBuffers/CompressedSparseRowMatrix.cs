@@ -6,13 +6,10 @@ using MathNet.Numerics.LinearAlgebra;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CudaLightSharp.SparseBuffers
 {
-    public class CompressedSparseRowMatrix : Buffers.Buffer
+    public class CompressedSparseRowMatrix : Buffers.ContiguousMemoryBuffer
     {
         public CompressedSparseRowMatrix(int nRows, int nCols, Vector nonZeroColumnIndices, Vector nNonZeroRows, MathDomain mathDomain)
             : base(false, // SparseVector doesn't allocate its memory in its buffer, but it uses the convenience vector this.values
@@ -83,7 +80,7 @@ namespace CudaLightSharp.SparseBuffers
                 nNonZeroRows.Add(nNonZeros);
             }
 
-            buffer.size = (uint)nNonZeros;
+            Buffer.size = (uint)nNonZeros;
 
             values = new Vector(nonZeroValues.Count, memorySpace, mathDomain);
             values.ReadFrom(nonZeroValues, nonZeroValues.Count);
@@ -109,9 +106,9 @@ namespace CudaLightSharp.SparseBuffers
         /// </summary>
         private void SyncPointers()
         {
-            _buffer.pointer = values.buffer.pointer;
-            _buffer.nonZeroColumnIndices = nonZeroColumnIndices.buffer.pointer;
-            _buffer.nNonZeroRows = nNonZeroRows.buffer.pointer;
+            _buffer.pointer = values.Buffer.pointer;
+            _buffer.nonZeroColumnIndices = nonZeroColumnIndices.Buffer.pointer;
+            _buffer.nNonZeroRows = nNonZeroRows.Buffer.pointer;
         }
 
         public override T[] GetRaw<T>()
@@ -176,11 +173,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(rhs.nRows == lhs.nCols);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs.nRows, rhs.nCols, lhs.memorySpace, lhs.mathDomain);
-            CuSparseApi.SparseMultiply(ret.buffer as MemoryTile, lhs._buffer, rhs.buffer as MemoryTile, lhs.nRows, rhs.nRows, MatrixOperation.None, MatrixOperation.None, 1.0);
+            CuSparseApi.SparseMultiply(ret.Buffer as MemoryTile, lhs._buffer, rhs.Buffer as MemoryTile, lhs.nRows, rhs.nRows, MatrixOperation.None, MatrixOperation.None, 1.0);
 
             return ret;
         }
@@ -190,11 +187,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(rhs.Size == lhs.nCols);
             Debug.Assert(lhs.memorySpace == rhs.memorySpace);
             Debug.Assert(lhs.mathDomain == rhs.mathDomain);
-            Debug.Assert(lhs.buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
+            Debug.Assert(lhs.Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
 
             Vector ret = new Vector(rhs.Size, lhs.memorySpace, lhs.mathDomain);
-            CuSparseApi.SparseDot(ret.buffer, lhs._buffer, rhs.buffer, MatrixOperation.None, 1.0);
+            CuSparseApi.SparseDot(ret.Buffer, lhs._buffer, rhs.Buffer, MatrixOperation.None, 1.0);
 
             return ret;
         }
@@ -224,11 +221,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(memorySpace == output.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
             Debug.Assert(mathDomain == output.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-            Debug.Assert(output.buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
+            Debug.Assert(output.Buffer.pointer != 0);
 
-            CuSparseApi.SparseMultiply(output.buffer as MemoryTile, _buffer, rhs.buffer as MemoryTile, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
+            CuSparseApi.SparseMultiply(output.Buffer as MemoryTile, _buffer, rhs.Buffer as MemoryTile, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
         }
 
         public Vector Dot(Vector rhs, MatrixOperation lhsOperation, double alpha)
@@ -254,11 +251,11 @@ namespace CudaLightSharp.SparseBuffers
             Debug.Assert(memorySpace == output.memorySpace);
             Debug.Assert(mathDomain == rhs.mathDomain);
             Debug.Assert(mathDomain == output.mathDomain);
-            Debug.Assert(buffer.pointer != 0);
-            Debug.Assert(rhs.buffer.pointer != 0);
-            Debug.Assert(output.buffer.pointer != 0);
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
+            Debug.Assert(output.Buffer.pointer != 0);
 
-            CuSparseApi.SparseDot(output.buffer, _buffer, rhs.buffer, lhsOperation, alpha);
+            CuSparseApi.SparseDot(output.Buffer, _buffer, rhs.Buffer, lhsOperation, alpha);
         }
 
 
@@ -274,6 +271,6 @@ namespace CudaLightSharp.SparseBuffers
         private Vector nNonZeroRows;
 
         private readonly SparseMemoryTile _buffer;
-        internal override MemoryBuffer buffer => _buffer;
+        internal override MemoryBuffer Buffer => _buffer;
     }
 }
