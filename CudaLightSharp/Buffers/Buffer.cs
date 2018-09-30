@@ -98,7 +98,14 @@ namespace CudaLightSharp.Buffers
             Debug.Assert((mathDomain == MathDomain.Double && typeof(T) == typeof(double)) ||
                          (mathDomain == MathDomain.Float && typeof(T) == typeof(float)) ||
                          (mathDomain == MathDomain.Int && typeof(T) == typeof(int)));
-            ReadFromImpl(rhs, rhs.Length);
+
+            T[] data = new T[rhs.Length];
+            int nRows = rhs.GetLength(0);
+            int nCols = rhs.GetLength(1);
+            for (int i = 0; i < nRows; i++)
+                for (int j = 0; j < nCols; j++)
+                    data[i + nRows * j] = rhs[i, j];
+            ReadFromImpl(data, data.Length);
         }
 
         public void ReadFrom<T>(T[,,] rhs) where T : struct, IEquatable<T>, IFormattable
@@ -207,7 +214,7 @@ namespace CudaLightSharp.Buffers
             if (disposed)
                 return;
 
-            Debug.WriteLine(String.Format("{0:G}, {1}: {2}[{3}]", DateTime.Now, "Disposing", GetType(), Buffer.pointer));
+            Console.WriteLine(String.Format("{0:G}, {1}: {2}[{3}]", DateTime.Now, "Disposing", GetType(), Buffer.pointer));
             Free();
 
             GC.SuppressFinalize(this);
@@ -229,13 +236,26 @@ namespace CudaLightSharp.Buffers
                 default:
                     throw new NotImplementedException();
             }
+
+            Buffer.pointer = 0;
         }
 
         #endregion
 
         #region Serialization
 
-        public virtual void ReadFrom<T>(string filePath) where T : struct, IEquatable<T>, IFormattable
+        public virtual void ReadFromTextFile<T>(string filePath) where T : struct, IEquatable<T>, IFormattable
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            T[] data = new T[lines.Length];
+
+            for (int i = 0; i < lines.Length; i++)
+                data[i] = (T)Convert.ChangeType(lines[i], typeof(T));
+
+            ReadFrom(data, data.Length);
+        }
+
+        public virtual void ReadFromBinaryFile<T>(string filePath) where T : struct, IEquatable<T>, IFormattable
         {
             byte[] bytes = File.ReadAllBytes(filePath);
             T[] data = ZeroFormatterSerializer.Deserialize<T[]>(bytes);

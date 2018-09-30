@@ -81,17 +81,17 @@ namespace CudaLightSharp.Buffers
                     throw new ArgumentNullException();
                 case MathDomain.Int:
                     {
-                        ReadFrom<int>(fileName);
+                        ReadFromBinaryFile<int>(fileName);
                         break;
                     }
                 case MathDomain.Float:
                     {
-                        ReadFrom<float>(fileName);
+                        ReadFromBinaryFile<float>(fileName);
                         break;
                     }
                 case MathDomain.Double:
                     {
-                        ReadFrom<double>(fileName);
+                        ReadFromBinaryFile<double>(fileName);
                         break;
                     }
                 default:

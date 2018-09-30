@@ -7,6 +7,8 @@ using CudaLightSharp.Manager.CudaAPI;
 using System.IO;
 using ZeroFormatter;
 using System.Collections.Generic;
+using System.Threading;
+using System.Globalization;
 
 #if FORCE_32_BIT
     using PtrT = System.UInt32;
@@ -26,9 +28,9 @@ namespace CudaLightSharp.Buffers
         {
             Debug.Assert(nRows * nCols == matrix.Length);
             Console.WriteLine("************** " + label + " **************");
-            for (uint j = 0; j < nCols; ++j)
+            for (uint i = 0; i < nRows; ++i)
             {
-                for (uint i = 0; i < nRows; ++i)
+                for (uint j = 0; j < nCols; ++j)
                     Console.Write(String.Format("m[{0},{1}]={2} ", i, j, matrix[i, j]));
                 Console.WriteLine();
             }
@@ -37,9 +39,9 @@ namespace CudaLightSharp.Buffers
         {
             Debug.Assert(nRows * nCols == matrix.Length);
             Console.WriteLine("************** " + label + " **************");
-            for (uint j = 0; j < nCols; ++j)
+            for (uint i = 0; i < nRows; ++i)
             {
-                for (uint i = 0; i < nRows; ++i)
+                for (uint j = 0; j < nCols; ++j)
                     Console.Write(String.Format("m[{0},{1}]={2} ", i, j, matrix[i + j * nRows]));
                 Console.WriteLine();
             }
@@ -162,17 +164,17 @@ namespace CudaLightSharp.Buffers
                     throw new ArgumentNullException();
                 case MathDomain.Int:
                     {
-                        ReadFrom<int>(fileName);
+                        ReadFromBinaryFile<int>(fileName);
                         break;
                     }
                 case MathDomain.Float:
                     {
-                        ReadFrom<float>(fileName);
+                        ReadFromBinaryFile<float>(fileName);
                         break;
                     }
                 case MathDomain.Double:
                     {
-                        ReadFrom<double>(fileName);
+                        ReadFromBinaryFile<double>(fileName);
                         break;
                     }
                 default:
@@ -395,9 +397,37 @@ namespace CudaLightSharp.Buffers
 
         #region Serialization
 
-        public override void ReadFrom<T>(string filePath)
+        public override void ReadFromTextFile<T>(string filePath)
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            T[][] data = new T[lines.Length][];
+
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string[] tokens = lines[i].Split(' ');
+                data[i] = new T[tokens.Length];
+                for (int j = 0; j < tokens.Length; j++)
+                    data[i][j] = (T)Convert.ChangeType(tokens[j], typeof(T), new CultureInfo("en-US"));
+            }
+
+            // convert it to 2D array
+            T[,] _data = new T[data.Length, data[0].Length];
+            for (int i = 0; i < data.Length; i++)                
+                for (int j = 0; j < data[0].Length; j++)
+                    _data[i, j] = data[i][j];
+
+            _buffer.nRows = (uint)data.Length;
+            _buffer.nCols = (uint)data[0].Length;
+            ReadFrom(_data);
+        }
+
+        public override void ReadFromBinaryFile<T>(string filePath)
         {
             byte[] bytes = File.ReadAllBytes(filePath);
+            if (bytes.Length > ZeroFormatterSerializer.MaximumLengthOfDeserialize)
+                ZeroFormatterSerializer.MaximumLengthOfDeserialize = bytes.Length;
+
             T[] dataWithSizeInfo = ZeroFormatterSerializer.Deserialize<T[]>(bytes);
 
             _buffer.nRows = (uint)Convert.ChangeType(dataWithSizeInfo[dataWithSizeInfo.Length - 2], typeof(uint));
