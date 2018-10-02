@@ -94,6 +94,15 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
+        private static extern unsafe int _KroneckerProductRaw(PtrT A, PtrT x, PtrT y, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain, double alpha);
+        public static void KroneckerProduct(MemoryTile A, MemoryBuffer x, MemoryBuffer y, double alpha)
+        {
+            int err = _KroneckerProductRaw(A.pointer, x.pointer, y.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain, alpha);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_KroneckerProductRaw", err);
+        }
+
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _CumulativeRowSumRaw(PtrT A, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain);
         public static void CumulativeRowSum(MemoryTile A)
         {

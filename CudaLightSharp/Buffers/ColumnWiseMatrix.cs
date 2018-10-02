@@ -265,6 +265,19 @@ namespace CudaLightSharp.Buffers
             return ret;
         }
 
+        public static ColumnWiseMatrix KroneckerProduct(Vector lhs, Vector rhs, double alpha = 1.0)
+        {
+            ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs.Size, rhs.Size, lhs.memorySpace, lhs.mathDomain);
+            KroneckerProduct(ret, lhs, rhs, alpha);
+
+            return ret;
+        }
+
+        public static void KroneckerProduct(ColumnWiseMatrix output, Vector lhs, Vector rhs, double alpha = 1.0)
+        {
+            CuBlasApi.KroneckerProduct(output._buffer, lhs.Buffer, rhs.Buffer, alpha);
+        }
+
         public static ColumnWiseMatrix operator *(ColumnWiseMatrix lhs, ColumnWiseMatrix rhs)
         {
             Debug.Assert(rhs.nRows == lhs.nCols);

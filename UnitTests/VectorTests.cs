@@ -96,7 +96,7 @@ namespace UnitTests
         [TestMethod]
         public void RandomUniform()
         {
-            var v = Vector.RandomUniform(10, 1234);
+            var v = Vector.RandomUniform(11, 1234);
             DeviceManager.CheckDeviceSanity();
 
             var _v = v.Get<float>();
@@ -107,7 +107,7 @@ namespace UnitTests
         [TestMethod]
         public void RandomGaussian()
         {
-            var v = Vector.RandomGaussian(10, 1234);
+            var v = Vector.RandomGaussian(11, 1234);
             DeviceManager.CheckDeviceSanity();
 
             var _v = v.Get<float>();

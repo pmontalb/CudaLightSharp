@@ -161,6 +161,33 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void KroneckerProduct()
+        {
+            Vector u = new Vector(32, 0.01);
+            DeviceManager.CheckDeviceSanity();
+            var _u = u.Get<float>();
+
+            Vector v = new Vector(64, 0.02);
+            DeviceManager.CheckDeviceSanity();
+            var _v = v.Get<float>();
+
+            var A = ColumnWiseMatrix.KroneckerProduct(u, v, 2.0);
+            DeviceManager.CheckDeviceSanity();
+            var _A = A.GetMatrix<float>();
+
+            for (int i = 0; i < A.nRows; ++i)
+            {
+                for (int j = 0; j < A.nCols; ++j)
+                {
+                    double expected = 2.0 * _u[i] * _v[j];
+                    double err = Math.Abs(expected - _A[i, j]);
+                    Assert.IsTrue(err <= 5e-5, String.Format("i({0}) j({1}) err({2})", i, j, err));
+                }
+            }
+        }
+
+
+        [TestMethod]
         public void Invert()
         {
             ColumnWiseMatrix A = GetInvertibleMatrix(128);
@@ -184,7 +211,6 @@ namespace UnitTests
                 }
             }
         }
-
 
         [TestMethod]
         public void Solve()
