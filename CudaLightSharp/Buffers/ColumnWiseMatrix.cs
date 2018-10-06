@@ -267,7 +267,7 @@ namespace CudaLightSharp.Buffers
 
         public static ColumnWiseMatrix KroneckerProduct(Vector lhs, Vector rhs, double alpha = 1.0)
         {
-            ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs.Size, rhs.Size, lhs.memorySpace, lhs.mathDomain);
+            ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs.Size, rhs.Size, 0.0, lhs.memorySpace, lhs.mathDomain);
             KroneckerProduct(ret, lhs, rhs, alpha);
 
             return ret;
@@ -338,6 +338,11 @@ namespace CudaLightSharp.Buffers
             CuBlasApi.Multiply(output._buffer, _buffer, rhs._buffer, nRows, rhs.nRows, lhsOperation, rhsOperation, alpha);
         }
 
+        public static void Multiply(ColumnWiseMatrix output, ColumnWiseMatrix lhs, ColumnWiseMatrix rhs, MatrixOperation lhsOperation = MatrixOperation.None, MatrixOperation rhsOperation = MatrixOperation.None, double alpha = 1.0)
+        {
+            lhs.Multiply(output, rhs, lhsOperation, rhsOperation, alpha);
+        }
+
         public Vector Dot(Vector rhs, MatrixOperation lhsOperation, double alpha)
         {
             Vector ret = new Vector(rhs.Size, memorySpace, rhs.mathDomain);
@@ -366,6 +371,11 @@ namespace CudaLightSharp.Buffers
             Debug.Assert(output.Buffer.pointer != 0);
 
             CuBlasApi.Dot(output.Buffer, _buffer, rhs.Buffer, lhsOperation, alpha);
+        }
+
+        public static void Dot(Vector output, ColumnWiseMatrix lhs, Vector rhs, MatrixOperation lhsOperation = MatrixOperation.None, double alpha = 1.0)
+        {
+            lhs.Dot(output, rhs, lhsOperation, alpha);
         }
 
         /// <summary>

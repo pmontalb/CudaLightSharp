@@ -163,7 +163,7 @@ namespace UnitTests
         [TestMethod]
         public void KroneckerProduct()
         {
-            Vector u = new Vector(32, 0.01);
+            Vector u = new Vector(128, 0.01);
             DeviceManager.CheckDeviceSanity();
             var _u = u.Get<float>();
 
@@ -181,7 +181,7 @@ namespace UnitTests
                 {
                     double expected = 2.0 * _u[i] * _v[j];
                     double err = Math.Abs(expected - _A[i, j]);
-                    Assert.IsTrue(err <= 5e-5, String.Format("i({0}) j({1}) err({2})", i, j, err));
+                    Assert.IsTrue(err <= 5e-4, String.Format("i({0}) j({1}) err({2})", i, j, err));
                 }
             }
         }

@@ -203,20 +203,25 @@ namespace CudaLightSharp.Buffers
 
         ~ContiguousMemoryBuffer()
         {
-            if (!disposed)
-                Console.WriteLine(String.Format("Not-disposed warning: {0}", GetType()));
+            Dispose(true);
+        }
+
+        protected void Dispose(bool isDisposing)
+        {
+            if (isDisposing && !disposed)
+            {
+                if (isOwner)
+                    Free();
+                disposed = true;
+            }
+
+            if (!isDisposing && !disposed)
+                throw new SystemException("Resource not successfully freed");
         }
 
         public void Dispose()
         {
-            if (!isOwner)
-                return;
-            if (disposed)
-                return;
-
-            Console.WriteLine(String.Format("{0:G}, {1}: {2}[{3}]", DateTime.Now, "Disposing", GetType(), Buffer.pointer));
-            Free();
-
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
