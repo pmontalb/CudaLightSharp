@@ -271,6 +271,6 @@ namespace CudaLightSharp.SparseBuffers
         private Vector nNonZeroRows;
 
         private readonly SparseMemoryTile _buffer;
-        internal override MemoryBuffer Buffer => _buffer;
+        public override MemoryBuffer Buffer => _buffer;
     }
 }

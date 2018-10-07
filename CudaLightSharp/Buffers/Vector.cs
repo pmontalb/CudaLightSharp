@@ -165,6 +165,11 @@ namespace CudaLightSharp.Buffers
             return ret;
         }
 
+        public void ElementWiseProduct(Vector rhs)
+        {
+            ElementWiseProduct(_buffer, rhs._buffer);
+        }
+
         public static Vector ElementWiseProduct(Vector lhs, Vector rhs)
         {
             Vector ret = lhs % rhs;
@@ -227,6 +232,6 @@ namespace CudaLightSharp.Buffers
         }
 
         private readonly MemoryBuffer _buffer;
-        internal override MemoryBuffer Buffer => _buffer;
+        public override MemoryBuffer Buffer => _buffer;
     }
 }

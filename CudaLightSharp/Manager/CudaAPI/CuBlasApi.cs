@@ -103,6 +103,54 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
+        private static extern unsafe int _ArgAbsMinRaw(ref int index, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
+        public static int AbsoluteMinimumIndex(MemoryBuffer x)
+        {
+            int ret = -1;
+            int err = _ArgAbsMinRaw(ref ret, x.pointer, x.size, x.memorySpace, x.mathDomain);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_ArgAbsMinRaw", err);
+
+            return ret;
+        }
+
+        [DllImport("CudaLightKernels")]
+        private static extern unsafe int _ArgAbsMaxRaw(ref int index, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
+        public static int AbsoluteMaximumIndex(MemoryBuffer x)
+        {
+            int ret = -1;
+            int err = _ArgAbsMaxRaw(ref ret, x.pointer, x.size, x.memorySpace, x.mathDomain);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_ArgAbsMaxRaw", err);
+
+            return ret;
+        }
+
+        [DllImport("CudaLightKernels")]
+        private static extern unsafe int _AbsMinRaw(ref double min, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
+        public static double MinimumInAbsoluteValue(MemoryBuffer x)
+        {
+            double ret = -1;
+            int err = _AbsMinRaw(ref ret, x.pointer, x.size, x.memorySpace, x.mathDomain);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AbsMinRaw", err);
+
+            return ret;
+        }
+
+        [DllImport("CudaLightKernels")]
+        private static extern unsafe int _AbsMaxRaw(ref double max, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
+        public static double MaximumInAbsoluteValue(MemoryBuffer x)
+        {
+            double ret = -1;
+            int err = _AbsMaxRaw(ref ret, x.pointer, x.size, x.memorySpace, x.mathDomain);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AbsMaxRaw", err);
+
+            return ret;
+        }
+
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _CumulativeRowSumRaw(PtrT A, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain);
         public static void CumulativeRowSum(MemoryTile A)
         {

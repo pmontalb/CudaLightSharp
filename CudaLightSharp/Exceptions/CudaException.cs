@@ -1256,7 +1256,7 @@ namespace CudaLightSharp.Exceptions
 
 
     // CudaLightInternalExceptions
-    internal struct CudaGenericKernelExceptionFactory
+    public struct CudaGenericKernelExceptionFactory
     {
         public static void ThrowException(string kernelName, int errorCode)
         {
@@ -1275,7 +1275,7 @@ namespace CudaLightSharp.Exceptions
         }
     };
 
-    internal struct CudaKernelExceptionFactory
+    public struct CudaKernelExceptionFactory
     {
         public static void ThrowException(string kernelName, int errorCode)
         {
@@ -1457,7 +1457,7 @@ namespace CudaLightSharp.Exceptions
         }
     };
 
-    internal struct CuBlasKernelExceptionFactory
+    public struct CuBlasKernelExceptionFactory
     {
         public static void ThrowException(string kernelName, int errorCode)
         {
@@ -1493,7 +1493,7 @@ namespace CudaLightSharp.Exceptions
         }
     };
 
-    struct CuSparseKernelExceptionFactory
+    public struct CuSparseKernelExceptionFactory
     {
         static void ThrowException(string kernelName, int errorCode)
         {

@@ -313,7 +313,7 @@ namespace CudaLightSharp.Buffers
         }
 
         MemoryCube _buffer;
-        internal override MemoryBuffer Buffer => _buffer;
+        public override MemoryBuffer Buffer => _buffer;
         internal readonly ColumnWiseMatrix[] cubes;
     }
 }

@@ -253,6 +253,6 @@ namespace CudaLightSharp.SparseBuffers
         
 
         private readonly SparseMemoryBuffer _buffer;
-        internal override MemoryBuffer Buffer => _buffer;
+        public override MemoryBuffer Buffer => _buffer;
     }
 }

@@ -455,6 +455,26 @@ namespace CudaLightSharp.Buffers
             CuBlasApi.Scale(Buffer, alpha);
         }
 
+        public int AbsoluteMinimumIndex()
+        {
+            return CuBlasApi.AbsoluteMinimumIndex(Buffer);
+        }
+
+        public int AbsoluteMaximumIndex()
+        {
+            return CuBlasApi.AbsoluteMaximumIndex(Buffer);
+        }
+
+        public double MinimumInAbsoluteValue()
+        {
+            return CuBlasApi.MinimumInAbsoluteValue(Buffer);
+        }
+
+        public double MaximumInAbsoluteValue()
+        {
+            return CuBlasApi.MaximumInAbsoluteValue(Buffer);
+        }
+
         #endregion
 
         public int Size => (int)Buffer.size;
@@ -462,7 +482,7 @@ namespace CudaLightSharp.Buffers
         public readonly MemorySpace memorySpace;
         public readonly MathDomain mathDomain;
 
-        abstract internal MemoryBuffer Buffer { get; }
+        abstract public MemoryBuffer Buffer { get; }
         protected readonly bool isOwner;
 
         private bool disposed = false;

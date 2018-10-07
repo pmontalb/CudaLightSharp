@@ -580,7 +580,7 @@ namespace CudaLightSharp.Buffers
         }
 
         private readonly MemoryTile _buffer;
-        internal override MemoryBuffer Buffer => _buffer;
+        public override MemoryBuffer Buffer => _buffer;
         internal readonly Vector[] columns;
     }
 }
