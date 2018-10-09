@@ -40,10 +40,10 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _AddEqualMatrixRaw(PtrT A, PtrT B, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain, MatrixOperation aOperation, MatrixOperation bOperation, double alpha);
-        public static void AddEqualMatrix(MemoryTile A, MemoryTile B, MatrixOperation aOperation, MatrixOperation bOperation, double alpha)
+        private static extern unsafe int _AddEqualMatrixRaw(PtrT A, PtrT B, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain, MatrixOperation aOperation, MatrixOperation bOperation, double alpha, double beta);
+        public static void AddEqualMatrix(MemoryTile A, MemoryTile B, MatrixOperation aOperation, MatrixOperation bOperation, double alpha, double beta)
         {
-            int err = _AddEqualMatrixRaw(A.pointer, B.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain, aOperation, bOperation, alpha);
+            int err = _AddEqualMatrixRaw(A.pointer, B.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain, aOperation, bOperation, alpha, beta);
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AddEqualMatrixRaw", err);
         }
@@ -76,19 +76,19 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _MultiplyRaw(PtrT A, PtrT B, PtrT C, uint nRowsB, uint nRowsC, uint nColsC, MemorySpace memorySpace, MathDomain mathDomain, uint leadingDimensionB, uint leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha);
-        public static void Multiply(MemoryTile A, MemoryTile B, MemoryTile C, int leadingDimensionB, int leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha)
+        private static extern unsafe int _MultiplyRaw(PtrT A, PtrT B, PtrT C, uint nRowsB, uint nRowsC, uint nColsC, MemorySpace memorySpace, MathDomain mathDomain, uint leadingDimensionB, uint leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha, double beta);
+        public static void Multiply(MemoryTile A, MemoryTile B, MemoryTile C, int leadingDimensionB, int leadingDimensionC, MatrixOperation bOperation, MatrixOperation cOperation, double alpha, double beta)
         {
-            int err = _MultiplyRaw(A.pointer, B.pointer, C.pointer, B.nRows, C.nRows, C.nCols, A.memorySpace, A.mathDomain, (uint)leadingDimensionB, (uint)leadingDimensionC, bOperation, cOperation, alpha);
+            int err = _MultiplyRaw(A.pointer, B.pointer, C.pointer, B.nRows, C.nRows, C.nCols, A.memorySpace, A.mathDomain, (uint)leadingDimensionB, (uint)leadingDimensionC, bOperation, cOperation, alpha, beta);
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_MultiplyRaw", err);
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _DotRaw(PtrT y, PtrT A, PtrT x, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain, MatrixOperation aOperation, double alpha);
-        public static void Dot(MemoryBuffer y, MemoryTile A, MemoryBuffer x, MatrixOperation aOperation, double alpha)
+        private static extern unsafe int _DotRaw(PtrT y, PtrT A, PtrT x, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain, MatrixOperation aOperation, double alpha, double beta);
+        public static void Dot(MemoryBuffer y, MemoryTile A, MemoryBuffer x, MatrixOperation aOperation, double alpha, double beta)
         {
-            int err = _DotRaw(y.pointer, A.pointer, x.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain, aOperation, alpha);
+            int err = _DotRaw(y.pointer, A.pointer, x.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain, aOperation, alpha, beta);
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_DotRaw", err);
         }

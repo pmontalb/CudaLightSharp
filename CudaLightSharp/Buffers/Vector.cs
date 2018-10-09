@@ -71,6 +71,14 @@ namespace CudaLightSharp.Buffers
         {
         }
 
+        public void ReadFrom(Vector rhs)
+        {
+            Debug.Assert(_buffer.pointer != 0);
+            Debug.Assert(rhs._buffer.pointer != 0);
+            Debug.Assert(Size == rhs.Size);
+            base.ReadFrom(rhs);
+        }
+
         public Vector(string fileName, MathDomain mathDomain)
         {
             _buffer = new MemoryBuffer(0, 0, memorySpace, mathDomain);
