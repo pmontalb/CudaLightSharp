@@ -440,13 +440,14 @@ namespace CudaLightSharp.Buffers
 
         internal static MemoryBuffer ElementWiseProduct(MemoryBuffer lhs, MemoryBuffer rhs)
         {
-            MemoryBuffer buffer = new MemoryBuffer(0, (uint)lhs.size, lhs.memorySpace, lhs.mathDomain);
-            Alloc(buffer);
+            return ElementWiseProduct(lhs, lhs, rhs);
+        }
 
-            MemoryManagerApi.AutoCopy(buffer, lhs);
-            CuBlasApi.ElementwiseProduct(lhs, buffer, rhs, 1.0);
+        internal static MemoryBuffer ElementWiseProduct(MemoryBuffer output, MemoryBuffer lhs, MemoryBuffer rhs)
+        {
+            CuBlasApi.ElementwiseProduct(output, lhs, rhs, 1.0);
 
-            return lhs;
+            return output;
         }
 
         public void Scale(double alpha)
