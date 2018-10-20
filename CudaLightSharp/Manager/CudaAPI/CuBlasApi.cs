@@ -115,6 +115,18 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
+        private static extern unsafe int _ColumnWiseArgAbsMinRaw(PtrT argMin, PtrT A, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain);
+        public static int ColumnWiseAbsoluteMinimumIndex(MemoryBuffer argMin, MemoryTile A)
+        {
+            int ret = -1;
+            int err = _ColumnWiseArgAbsMinRaw(argMin.pointer, A.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_ColumnWiseArgAbsMinRaw", err);
+
+            return ret;
+        }
+
+        [DllImport("CudaLightKernels")]
         private static extern unsafe int _ArgAbsMaxRaw(ref int index, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
         public static int AbsoluteMaximumIndex(MemoryBuffer x)
         {
@@ -122,6 +134,18 @@ namespace CudaLightSharp.Manager.CudaAPI
             int err = _ArgAbsMaxRaw(ref ret, x.pointer, x.size, x.memorySpace, x.mathDomain);
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_ArgAbsMaxRaw", err);
+
+            return ret;
+        }
+
+        [DllImport("CudaLightKernels")]
+        private static extern unsafe int _ColumnWiseArgAbsMaxRaw(PtrT argMin, PtrT A, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain);
+        public static int ColumnWiseAbsoluteMaximumIndex(MemoryBuffer argMin, MemoryTile A)
+        {
+            int ret = -1;
+            int err = _ColumnWiseArgAbsMaxRaw(argMin.pointer, A.pointer, A.nRows, A.nCols, A.memorySpace, A.mathDomain);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_ColumnWiseArgAbsMaxRaw", err);
 
             return ret;
         }

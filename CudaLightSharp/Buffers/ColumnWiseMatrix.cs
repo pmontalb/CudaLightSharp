@@ -275,6 +275,36 @@ namespace CudaLightSharp.Buffers
             return ret;
         }
 
+        public Vector ColumnWiseAbsoluteMinimumIndex()
+        {
+            Vector ret = new Vector(nCols, memorySpace, MathDomain.Int);
+            ColumnWiseAbsoluteMinimumIndex(ret);
+
+            return ret;
+        }
+
+        public void ColumnWiseAbsoluteMinimumIndex(Vector output)
+        {
+            Debug.Assert(output.Buffer.pointer != 0);
+            Debug.Assert(output.Size == nCols);
+            CuBlasApi.ColumnWiseAbsoluteMinimumIndex(output.Buffer, _buffer);
+        }
+
+        public Vector ColumnWiseAbsoluteMaximumIndex()
+        {
+            Vector ret = new Vector(nCols, memorySpace, MathDomain.Int);
+            ColumnWiseAbsoluteMaximumIndex(ret);
+
+            return ret;
+        }
+
+        public void ColumnWiseAbsoluteMaximumIndex(Vector output)
+        {
+            Debug.Assert(output.Buffer.pointer != 0);
+            Debug.Assert(output.Size == nCols);
+            CuBlasApi.ColumnWiseAbsoluteMaximumIndex(output.Buffer, _buffer);
+        }
+
         public static ColumnWiseMatrix KroneckerProduct(Vector lhs, Vector rhs, double alpha = 1.0)
         {
             ColumnWiseMatrix ret = new ColumnWiseMatrix(lhs.Size, rhs.Size, 0.0, lhs.memorySpace, lhs.mathDomain);

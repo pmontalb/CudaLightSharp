@@ -476,6 +476,11 @@ namespace CudaLightSharp.Buffers
             return CuBlasApi.MaximumInAbsoluteValue(Buffer);
         }
 
+        public double Sum()
+        {
+            return CubApi.Sum(Buffer);
+        }
+
         #endregion
 
         public int Size => (int)Buffer.size;

@@ -260,7 +260,27 @@ namespace UnitTests
 
             Assert.IsTrue(Math.Abs(min - _min) <= 1e-7);
             Assert.IsTrue(Math.Abs(max - _max) <= 1e-7);
+        }
 
+        [TestMethod]
+        public void ColumnWiseAbsoluteMinMax()
+        {
+            ColumnWiseMatrix A = ColumnWiseMatrix.LinSpace(128, 64, -1, 1);
+            var _A = A.GetMatrix<float>();
+
+            var min = A.ColumnWiseAbsoluteMinimumIndex().GetRaw<int>();
+            var max = A.ColumnWiseAbsoluteMaximumIndex().GetRaw<int>();
+
+            int[] _min = new int[A.nCols];
+            int[] _max = new int[A.nCols];
+            for (int j = 0; j < A.nCols; j++)
+            {
+                _min[j] = _A.Column(j).AbsoluteMinimumIndex();
+                _max[j] = _A.Column(j).AbsoluteMaximumIndex();
+
+                Assert.AreEqual(min[j] - 1, _min[j]);
+                Assert.AreEqual(max[j] - 1, _max[j]);
+            }
         }
     }
 }

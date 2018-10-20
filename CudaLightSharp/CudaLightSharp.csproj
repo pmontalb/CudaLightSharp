@@ -75,6 +75,7 @@
     <Compile Include="CudaStructures\Utilities.cs" />
     <Compile Include="Exceptions\CudaException.cs" />
     <Compile Include="Exceptions\Exception.cs" />
+    <Compile Include="Manager\CudaAPI\CubApi.cs" />
     <Compile Include="Manager\CudaAPI\BufferInitializerApi.cs" />
     <Compile Include="Manager\CudaAPI\CuBlasApi.cs" />
     <Compile Include="Manager\CudaAPI\CuSparseApi.cs" />
