@@ -241,29 +241,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void AbsoluteMinMax()
-        {
-            Vector x = Vector.LinSpace(128, -1, 1);
-            var _x = x.Get<float>();
-
-            double min = x.MinimumInAbsoluteValue();
-            double max = x.MaximumInAbsoluteValue();
-
-            double _min = 1e9, _max = 0.0;
-            for (int i = 0; i < x.Size; i++)
-            {
-                if (Math.Abs(_x[i]) < Math.Abs(_min))
-                    _min = _x[i];
-                if (Math.Abs(_x[i]) > Math.Abs(_max))
-                    _max = _x[i];
-            }
-
-            Assert.IsTrue(Math.Abs(min - _min) <= 1e-7);
-            Assert.IsTrue(Math.Abs(max - _max) <= 1e-7);
-        }
-
-        [TestMethod]
-        public void ColumnWiseAbsoluteMinMax()
+        public void ColumnWiseArgAbsoluteMinMax()
         {
             ColumnWiseMatrix A = ColumnWiseMatrix.LinSpace(128, 64, -1, 1);
             var _A = A.GetMatrix<float>();
@@ -281,6 +259,27 @@ namespace UnitTests
                 Assert.AreEqual(min[j] - 1, _min[j]);
                 Assert.AreEqual(max[j] - 1, _max[j]);
             }
+        }
+
+        [TestMethod]
+        public void CountEquals()
+        {
+            Vector u = Vector.RandomGaussian(128, 1234);
+            Assert.AreEqual(u.CountEquals(u), u.Size);
+
+            var _u = u.Get<float>();
+            _u[_u.Count / 2] *= 2;
+
+            Vector v = new Vector(u.Size);
+            v.ReadFrom(_u);
+
+            Assert.AreEqual(u.CountEquals(v), u.Size - 1);
+            Assert.AreEqual(v.CountEquals(u), u.Size - 1);
+
+            Vector w = Vector.LinSpace(u.Size, -3.14, 3.14);
+            Assert.AreEqual(w.CountEquals(w), w.Size);
+            Assert.AreEqual(w.CountEquals(u), 0);
+            Assert.AreEqual(w.CountEquals(v), 0);
         }
     }
 }

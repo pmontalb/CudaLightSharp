@@ -151,30 +151,6 @@ namespace CudaLightSharp.Manager.CudaAPI
         }
 
         [DllImport("CudaLightKernels")]
-        private static extern unsafe int _AbsMinRaw(ref double min, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
-        public static double MinimumInAbsoluteValue(MemoryBuffer x)
-        {
-            double ret = -1;
-            int err = _AbsMinRaw(ref ret, x.pointer, x.size, x.memorySpace, x.mathDomain);
-            if (err != 0)
-                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AbsMinRaw", err);
-
-            return ret;
-        }
-
-        [DllImport("CudaLightKernels")]
-        private static extern unsafe int _AbsMaxRaw(ref double max, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
-        public static double MaximumInAbsoluteValue(MemoryBuffer x)
-        {
-            double ret = -1;
-            int err = _AbsMaxRaw(ref ret, x.pointer, x.size, x.memorySpace, x.mathDomain);
-            if (err != 0)
-                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_AbsMaxRaw", err);
-
-            return ret;
-        }
-
-        [DllImport("CudaLightKernels")]
         private static extern unsafe int _CumulativeRowSumRaw(PtrT A, uint nRows, uint nCols, MemorySpace memorySpace, MathDomain mathDomain);
         public static void CumulativeRowSum(MemoryTile A)
         {
@@ -209,5 +185,15 @@ namespace CudaLightSharp.Manager.CudaAPI
             if (err != 0)
                 Exceptions.CuBlasKernelExceptionFactory.ThrowException("_InvertRaw", err);
         }
+
+        [DllImport("CudaLightKernels")]
+        private static extern unsafe int _IsNonZeroRaw(PtrT z, PtrT x, uint size, MemorySpace memorySpace, MathDomain mathDomain);
+        public static void IsNonZero(MemoryBuffer z, MemoryBuffer x)
+        {
+            int err = _IsNonZeroRaw(z.pointer, x.pointer, z.size, z.memorySpace, z.mathDomain);
+            if (err != 0)
+                Exceptions.CuBlasKernelExceptionFactory.ThrowException("_IsNonZeroRaw", err);
+        }
+
     }
 }

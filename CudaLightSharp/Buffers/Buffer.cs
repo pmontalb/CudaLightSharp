@@ -130,7 +130,7 @@ namespace CudaLightSharp.Buffers
             {
                 // need to reallocate device memory
                 if (Buffer.pointer != 0)
-                    Free();
+                    Free(Buffer);
 
                 Buffer.size = (uint)nElements;
                 Alloc(Buffer);
@@ -211,7 +211,7 @@ namespace CudaLightSharp.Buffers
             if (isDisposing && !disposed)
             {
                 if (isOwner)
-                    Free();
+                    Free(Buffer);
                 disposed = true;
             }
 
@@ -225,24 +225,24 @@ namespace CudaLightSharp.Buffers
             GC.SuppressFinalize(this);
         }
 
-        private void Free()
+        private static void Free(MemoryBuffer buffer)
         {
-            Debug.Assert(Buffer.pointer != 0);
-            switch (memorySpace)
+            Debug.Assert(buffer.pointer != 0);
+            switch (buffer.memorySpace)
             {
                 case MemorySpace.Null:
                     throw new ArgumentNullException();
                 case MemorySpace.Host:
-                    MemoryManagerApi.FreeHost(Buffer);
+                    MemoryManagerApi.FreeHost(buffer);
                     break;
                 case MemorySpace.Device:
-                    MemoryManagerApi.Free(Buffer);
+                    MemoryManagerApi.Free(buffer);
                     break;
                 default:
                     throw new NotImplementedException();
             }
 
-            Buffer.pointer = 0;
+            buffer.pointer = 0;
         }
 
         #endregion
@@ -458,27 +458,82 @@ namespace CudaLightSharp.Buffers
 
         public int AbsoluteMinimumIndex()
         {
+            Debug.Assert(Buffer.pointer != 0);
             return CuBlasApi.AbsoluteMinimumIndex(Buffer);
         }
 
         public int AbsoluteMaximumIndex()
         {
+            Debug.Assert(Buffer.pointer != 0);
             return CuBlasApi.AbsoluteMaximumIndex(Buffer);
         }
 
-        public double MinimumInAbsoluteValue()
+        public double Minimum()
         {
-            return CuBlasApi.MinimumInAbsoluteValue(Buffer);
+            Debug.Assert(Buffer.pointer != 0);
+            return CubApi.Min(Buffer);
         }
 
-        public double MaximumInAbsoluteValue()
+        public double AbsoluteMinimum()
         {
-            return CuBlasApi.MaximumInAbsoluteValue(Buffer);
+            Debug.Assert(Buffer.pointer != 0);
+            return CubApi.AbsMin(Buffer);
+        }
+
+        public double Maximum()
+        {
+            Debug.Assert(Buffer.pointer != 0);
+            return CubApi.Max(Buffer);
+        }
+
+        public double AbsoluteMaximum()
+        {
+            Debug.Assert(Buffer.pointer != 0);
+            return CubApi.AbsMax(Buffer);
         }
 
         public double Sum()
         {
+            Debug.Assert(Buffer.pointer != 0);
             return CubApi.Sum(Buffer);
+        }
+
+        public int CountEquals(ContiguousMemoryBuffer rhs)
+        {
+            MemoryBuffer cache = new MemoryBuffer();
+            return CountEquals(rhs, cache);
+        }
+
+        public int CountEquals(ContiguousMemoryBuffer rhs, MemoryBuffer cache)
+        {
+            Debug.Assert(Buffer.pointer != 0);
+            Debug.Assert(rhs.Buffer.pointer != 0);
+            Debug.Assert(Size == rhs.Size);
+
+            bool needToFreeCache = cache.pointer == 0;
+            if (needToFreeCache)
+            {
+                cache.memorySpace = memorySpace;
+                cache.mathDomain = mathDomain;
+                cache.size = (uint)Size;
+                Alloc(cache);
+            }
+
+            // calculate the difference
+            CuBlasApi.Subtract(cache, Buffer, rhs.Buffer);
+
+            // calculate how many non-zeros, overriding cache
+            CuBlasApi.IsNonZero(cache, cache);
+
+            double ret = CubApi.Sum(cache);
+
+            // we are counting the zero entries
+            ret = Size - ret;
+
+            if (needToFreeCache)
+                Free(cache);
+
+            return (int)ret;
         }
 
         #endregion
